@@ -1,1 +1,1 @@
-# sacred-records-node
+DEBUG=Sacred-Records-Node:* npm start
