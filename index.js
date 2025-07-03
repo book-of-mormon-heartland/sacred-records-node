@@ -5,11 +5,8 @@ const port = 8080;
 const router = express.Router();
 const cors = require('cors');
 
-
 app.use(express.json());       // to support JSON-encoded bodies
 app.use(express.urlencoded()); // to support URL-encoded bodies
-
-
 app.use(cors({
     origin: 'http://localhost:8080'
 }));
@@ -25,6 +22,9 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+
+const database = require("./database/database.js");
+
 
 const rest = require("./routes/rest.js");
 app.use("/rest", rest);
