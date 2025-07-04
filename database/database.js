@@ -33,6 +33,8 @@ db.settings({
   databaseId: 'authenticator', // Uncomment and replace with your actual database ID if
 });
 
+module.exports = db;
+
 // staging and production should look something more like this:
 /*
 const admin = require('firebase-admin');
@@ -41,7 +43,6 @@ const db = admin.firestore();
 db.settings({
   databaseId: 'authenticator', // Uncomment and replace with your actual database ID if
 });
-
 */
 
 // below is code that works for testing purposes
