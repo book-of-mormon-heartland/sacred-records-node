@@ -1,9 +1,13 @@
 const { Firestore } = require('@google-cloud/firestore');
+const settings = require('./../settings/settings.js');
 
+//console.log(settings)
 
-/*. works
+// works in docker
+/*
 const admin = require('firebase-admin');
-const serviceAccount = require('./trisummit-io-feea3939aa4d.json'); // Adjust the path as needed
+
+const serviceAccount = require('./../keys/trisummit-io-feea3939aa4d.json'); // Adjust the path as needed
 admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
 });
@@ -16,23 +20,22 @@ db.settings({
 */
 
 // code for dev with propers settings in the development environment including see readme.md
+
 require('dotenv').config();
 const admin = require('firebase-admin');
-const serviceAccountPath = process.env.GOOGLE_APPLICATION_CREDENTIALS; // Or your custom env variable name
+var serviceAccountPath = settings.GOOGLE_APPLICATION_CREDENTIALS;
 if (serviceAccountPath) {
     const serviceAccount = require(serviceAccountPath);
     admin.initializeApp({
         credential: admin.credential.cert(serviceAccount)
     });
-} else {
-      console.error('GOOGLE_APPLICATION_CREDENTIALS environment variable not set.');
 }
+
 const db = admin.firestore();
 db.settings({
   ignoreUndefinedProperties: true, // Optional: useful for preventing errors with undefined values
   databaseId: 'authenticator', // Uncomment and replace with your actual database ID if
 });
-
 module.exports = db;
 
 // staging and production should look something more like this:
