@@ -6,7 +6,7 @@ gcloud iam service-accounts add-iam-policy-binding firestore-sa@trisummit-io.iam
         --role roles/datastore.user
 
 npm install dotenv
-export GOOGLE_APPLICATION_CREDENTIALS="/Users/briannettles/Desktop/research-and-development/development/bookofmormonheartland/sacredrecords/node/keys/trisummit-io-feea3939aa4d.json"
+export GOOGLE_APPLICATION_CREDENTIALS="/Users/briannettles/development/bookofmormonheartland/sacred-apps/sacredrecords/safefiles/trisummit-io-feea3939aa4d.json"
 
 docker compose up --build
 
@@ -19,3 +19,4 @@ gcloud auth application-default login
 installation:
 npm install @google-cloud/firestore
 DEBUG=Sacred-Records-Node:* npm start
+npm i react-native-feather
