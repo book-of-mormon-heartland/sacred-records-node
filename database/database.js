@@ -35,10 +35,10 @@ if (serviceAccountPath) {
 const db = admin.firestore();
 db.settings({
   ignoreUndefinedProperties: true, // Optional: useful for preventing errors with undefined values
-  databaseId: 'authenticator', // Uncomment and replace with your actual database ID if
+  databaseId: 'sacredrecords', // Uncomment and replace with your actual database ID if
 });
 
-function addGoogleUser( user ) {
+function addUser( user ) {
   const docRef = db.collection('users').doc(user.id);
   docRef.set({
         photo: user.photo,
@@ -51,17 +51,32 @@ function addGoogleUser( user ) {
       //console.log('Google User Added Successfully!');
 }
 
-function addGoogleToken( token, userid ) {
-  const docRef = db.collection('googletokens').doc(userid);
+function addBook( book ) {
+  const docRef = db.collection('books').doc(book.id);
+  docRef.set({
+    title: book.title,
+    subTitle: book.subTitle,
+    thumbnail: book.thumbnail,
+    isParent: book.isParent,
+    order: book.order,
+    id: book.id,
+    parent: book.parent,
+    visible: book.visible
+  });     //console.log('Google User Added Successfully!');
+}
+
+
+function addToken( userid, token ) {
+  const docRef = db.collection('tokens').doc(userid);
   docRef.set({
     token: token,
     userId: userid,
   });
 }
 
-function removeGoogleToken( userid ) {
+function removeToken( userid ) {
   try {
-    const res = db.collection('googletokens').doc(userid).delete();
+    const res = db.collection('tokens').doc(userid).delete();
   } catch (error) {
     console.error("Error removing document: ", error);
   }
@@ -71,7 +86,8 @@ function removeGoogleToken( userid ) {
 
 module.exports = {
   db,
-  addGoogleUser,
-  addGoogleToken,
-  removeGoogleToken
+  addUser,
+  addBook,
+  addToken,
+  removeToken
 };

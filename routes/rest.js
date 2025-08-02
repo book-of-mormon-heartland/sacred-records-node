@@ -2,17 +2,19 @@ const express = require("express");
 const { text } = require('body-parser');
 const router = express.Router();
 const { OAuth2Client } = require('google-auth-library');
-const { db, addGoogleUser, addGoogleToken, removeGoogleToken } = require("../database/database.js"); // Import the database module
+const { db, addUser, addBook, addToken, removeToken, getBooks } = require("../database/database.js"); // Import the database module
+require('dotenv').config(); // Load environment variables
+
 
 const GOOGLE_WEB_CLIENT_ID = '376185747738-hced54r8i2jc4bjq428i54dp2g4uhnvo.apps.googleusercontent.com'; 
 const GOOGLE_ANDROID_CLIENT_ID = '376185747738-ha1jqq32roeta8g7c34c7koend7lmp5o.apps.googleusercontent.com'; 
 const GOOGLE_IOS_CLIENT_ID = '376185747738-t1nrjh269jqarco0grlo6a5vs8fcbf8b.apps.googleusercontent.com';
-
+const jwt = require('jsonwebtoken');
+const jwtSecret = process.env.JWT_SECRET;
 
 // Home page route.
 router.get("/", function (req, res) {
-
-     res.send("Rest home page");
+  res.send("Rest home page");
 });
 
 
@@ -24,8 +26,6 @@ router.post('/POST/googlelogin', (req, res) => {
 
   // validate the token with google.
   const client = new OAuth2Client(GOOGLE_WEB_CLIENT_ID);
-  
-  
   async function verify() {
     const ticket = await client.verifyIdToken({
         idToken: token,
@@ -37,39 +37,132 @@ router.post('/POST/googlelogin', (req, res) => {
     if (payload.sub !== user.id) {
       return res.json(
         JSON.stringify({
-          "message": "Error: Token user ID does not match provided user ID"
+          "message": "Error: Token user ID does not match provided user ID",
+          "jwtToken": "",
+          "refreshToken": "",
         }));
     }
     // Add or update the user.  Same thing here.
-    addGoogleUser(user);
-    addGoogleToken(token, user.id);
+    addUser(user);
+    // generate the jwt token.
+    let jwtToken = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: '1h' });
+    let refreshToken = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: '7d' });
+    //no need to store in database.
+    //addToken(user.id, jwtToken);
     return res.json(
       JSON.stringify({
-        "message": "Success"
+        "message": "Success",
+        "jwtToken": jwtToken,
+        "refreshToken": refreshToken,
       })
     )
   }
   verify().catch((error) => {
     return res.json(
       JSON.stringify({
-        "message": error
+        "message": error,
+        "jwtToken": "",
+        "refreshToken": "",
       })
     );
   });
-
 });
 
-router.post('/POST/googlelogout', (req, res) => {
-  const userid = req.body.userid;
-  //console.log("Deleting token for userid: ", userid);
-  removeGoogleToken(userid);
+// no need to even call this endpoint.
+/*
+router.post('/POST/logout', (req, res) => {
+  const jwtToken = req.headers['authorization'];
+  try {
+      const decodedPayload = jwt.verify(jwtToken, jwtSecret);
+      //console.log('Looking for expiration info on next line')
+      //console.log(decodedPayload)
+      //removeToken(decodedPayload.userId);
+  } catch (error) {
+      console.error('Error verifying or decoding token:', error.message);
+  }
   return res.json(
     JSON.stringify({
-      "message": "Success"
+      "message": "Success",
+      "jwtToken": "",
+      "refreshToken": "",
     })
   )
 });
+*/
 
+router.post('/POST/refreshtoken', (req, res) => {
+  const jwtToken = req.headers['authorization'];
+  try {
+      const payload = jwt.verify(jwtToken, jwtSecret);
+      console.log(payload);
+      console.log(payload.userId);
+      let expiration_timestamp = payload.exp
+      let current_timestamp_utc = int(time.time()) 
+      console.log("Expiration Timestamp: ", expiration_timestamp);
+      console.log("Current Timestamp: ", current_timestamp_utc);
+
+      if (expiration_timestamp <= current_timestamp_utc){
+        let newJwtToken = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: '1h' });
+        return res.json(
+          JSON.stringify({
+            "message": "Token Refresh.",
+            "jwtToken": newJwtToken,
+          })
+        );
+      } else {
+        console.log("Token is still valid");
+        return res.json(
+          JSON.stringify({
+            "message": "Token is still valid, no need to refresh.",
+            "jwtToken": jwtToken,
+          })
+        );
+      }
+
+
+      JSON.stringify({
+        "message": "Your token was valid but now removed. Sign in again.",
+        "jwtToken": "",
+        "refreshToken": "",
+      })
+
+  } catch (error) {
+    console.error('Error verifying or decoding token:', error.message);
+    return res.json(
+      JSON.stringify({
+        "message": "Error",
+        "jwtToken": "",
+        "refreshToken": "",
+      })
+    )
+  }
+
+});
+
+router.get('/GET/books', (req, res) => {
+
+  console.log("GET /GET/books called");
+  
+   db.collection('books').where("isParent", "==", true).get()
+    .then(snapshot => {
+      if (snapshot.empty) {
+        //console.log('No matching documents.');
+        return res.status(404).send('No users found');
+      }
+
+      let users = [];
+      snapshot.forEach(doc => {
+        users.push({ id: doc.id, ...doc.data() });
+      });
+      return res.json(users);
+    })
+    .catch(err => {
+      //console.error('Error getting documents', err);
+      return res.status(500).send('Error retrieving users');
+    });
+    
+    
+});
 
 
 
@@ -154,8 +247,8 @@ router.post("/translate", function (req, res) {
   });
 });
 
-
-
-
-
 module.exports = router;
+
+
+
+
