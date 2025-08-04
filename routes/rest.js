@@ -2,7 +2,7 @@ const express = require("express");
 const { text } = require('body-parser');
 const router = express.Router();
 const { OAuth2Client } = require('google-auth-library');
-const { db, addUser, addBook, addToken, removeToken, getBooks } = require("../database/database.js"); // Import the database module
+const { db, addUser, addBook, addToken, removeToken, getBook, addChapter } = require("../database/database.js"); // Import the database module
 require('dotenv').config(); // Load environment variables
 
 
@@ -143,11 +143,11 @@ router.get('/GET/books', (req, res) => {
 
   console.log("GET /GET/books called");
   
-   db.collection('books').where("isParent", "==", true).get()
+   db.collection('books').where("isParent", "==", true).orderBy("order", "asc").get()
     .then(snapshot => {
       if (snapshot.empty) {
-        //console.log('No matching documents.');
-        return res.status(404).send('No users found');
+        console.log('No matching documents.');
+        return res.status(404).send('No Matching found');
       }
 
       let users = [];
@@ -157,14 +157,36 @@ router.get('/GET/books', (req, res) => {
       return res.json(users);
     })
     .catch(err => {
-      //console.error('Error getting documents', err);
+      console.error('Error getting documents', err);
       return res.status(500).send('Error retrieving users');
     });
-    
-    
 });
 
+router.get('/GET/book', (req, res) => {
+  let bookId = req.query.bookid;
+  console.log("bookId " + bookId);
+  console.log("GET /GET/book called");
+  
+  db.collection('books').where("parent", "==", bookId ).orderBy("order", "asc").get()
+    .then(snapshot => {
+      if (snapshot.empty) {
+        console.log('No matching documents.');
+        //return res.status(404).send('No Books found');
+        return res.json([]);
+      }
 
+      let book = [];
+      snapshot.forEach(doc => {
+        book.push({ id: doc.id, ...doc.data() });
+      });
+      return res.json(book);
+    })
+    .catch(err => {
+      console.error('Error getting documents', err);
+      return res.status(500).send('Error retrieving book');
+    });
+    
+});
 
 // GET all users
 router.get('/GET/users', (req, res) => {
@@ -246,6 +268,1132 @@ router.post("/translate", function (req, res) {
     );
   });
 });
+
+
+
+router.get('/GET/addBooks', (req, res) => {
+
+  console.log("GET /GET/addBooks called");
+  //removeAllBooks();
+  let book = {}
+  let chapter = {}
+
+
+  book = {
+    id: "the-nephite-record",
+    title: "The Nephite Record",
+    subTitle: "1844 Text",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/the-nephite-record-thumbnail-2.jpg",
+    thumbnailTitle: "Nephite Record",
+    isParent: true,
+    hasChildBooks: true,
+    order: 1,
+    parent: "",
+    visible: true
+  }
+  addBook(book);
+
+  book = {
+    id: "nr-introduction",
+    title: "Introduction",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Intro",
+    isParent: false,
+    hasChildBooks: false,
+    order: 1,
+    parent: "the-nephite-record",
+    visible: true
+  }
+  addBook(book);
+
+  chapter = {
+    id: "nr-intro-title-page",
+    title: "Title Page",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/intro-thumbnail.jpg",
+    thumbnailTitle: "Title Page",
+    order: 1,
+    parent: "nr-introduction",
+    previousChapter: "",
+    nextChapter: "nr-intro-three-witnesses",
+    visible: true
+  }
+  addChapter(chapter);
+
+  chapter = {
+    id: "nr-intro-three-witnesses",
+    title: "The Three Witnesses",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Three Witnesses",
+    order: 2,
+    parent: "nr-introduction",
+    previousChapter: "nr-intro-title-page",
+    nextChapter: "nr-intro-eight-witnesses",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-intro-eight-witnesses",
+    title: "The Eight Witnesses",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "The Eight Witnesses",
+    order: 3,
+    parent: "nr-introduction",
+    previousChapter: "nr-intro-three-witnesses",
+    nextChapter: "nr-1-nephi-1",
+    visible: true
+  }
+  addChapter(chapter);
+
+
+
+  book = {
+    id: "nr-1-nephi",
+    title: "The First Book of Nephi",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/1-nephi-thumbnail.jpg",
+    thumbnailTitle: "1 Nephi",
+    isParent: false,
+    hasChildBooks: false,
+    order: 2,
+    parent: "the-nephite-record",
+    visible: true
+  }
+  addBook(book);
+
+  chapter = {
+    id: "nr-1-nephi-1",
+    title: "Chapter 1",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Chapter 1",
+    order: 1,
+    parent: "nr-1-nephi",
+    previousChapter: "nr-intro-eight-witnesses",
+    nextChapter: "nr-1-nephi-2",
+    visible: true
+  }
+  addChapter(chapter);
+
+  chapter = {
+    id: "nr-1-nephi-2",
+    title: "Chapter 2",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Chapter 2",
+    order: 2,
+    parent: "nr-1-nephi",
+    previousChapter: "nr-1-nephi-1",
+    nextChapter: "nr-1-nephi-3",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-1-nephi-3",
+    title: "Chapter 3",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Chapter 3",
+    order: 3,
+    parent: "nr-1-nephi",
+    previousChapter: "nr-1-nephi-2",
+    nextChapter: "nr-1-nephi-4",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-1-nephi-4",
+    title: "Chapter 4",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Chapter 4",
+    order: 4,
+    parent: "nr-1-nephi",
+    previousChapter: "nr-1-nephi-3",
+    nextChapter: "nr-1-nephi-5",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-1-nephi-5",
+    title: "Chapter 5",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Chapter 5",
+    order: 5,
+    parent: "nr-1-nephi",
+    previousChapter: "nr-1-nephi-4",
+    nextChapter: "nr-1-nephi-6",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-1-nephi-6",
+    title: "Chapter 6",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Chapter 6",
+    order: 6,
+    parent: "nr-1-nephi",
+    previousChapter: "nr-1-nephi-5",
+    nextChapter: "nr-1-nephi-7",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-1-nephi-7",
+    title: "Chapter 7",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Chapter 7",
+    order: 7,
+    parent: "nr-1-nephi",
+    previousChapter: "nr-1-nephi-6",
+    nextChapter: "nr-1-nephi-8",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-1-nephi-8",
+    title: "Chapter 8",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Chapter 8",
+    order: 8,
+    parent: "nr-1-nephi",
+    previousChapter: "nr-1-nephi-7",
+    nextChapter: "nr-1-nephi-9",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-1-nephi-9",
+    title: "Chapter 9",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Chapter 9",
+    order: 9,
+    parent: "nr-1-nephi",
+    previousChapter: "nr-1-nephi-8",
+    nextChapter: "nr-1-nephi-10",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-1-nephi-10",
+    title: "Chapter 10",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Chapter 10",
+    order: 10,
+    parent: "nr-1-nephi",
+    previousChapter: "nr-1-nephi-9",
+    nextChapter: "nr-1-nephi-11",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-1-nephi-11",
+    title: "Chapter 11",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Chapter 11",
+    order: 11,
+    parent: "nr-1-nephi",
+    previousChapter: "nr-1-nephi-10",
+    nextChapter: "nr-1-nephi-12",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-1-nephi-12",
+    title: "Chapter 12",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Chapter 12",
+    order: 12,
+    parent: "nr-1-nephi",
+    previousChapter: "nr-1-nephi-11",
+    nextChapter: "nr-1-nephi-13",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-1-nephi-13",
+    title: "Chapter 13",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Chapter 13",
+    order: 13,
+    parent: "nr-1-nephi",
+    previousChapter: "nr-1-nephi-12",
+    nextChapter: "nr-1-nephi-14",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-1-nephi-14",
+    title: "Chapter 14",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Chapter 14",
+    order: 14,
+    parent: "nr-1-nephi",
+    previousChapter: "nr-1-nephi-13",
+    nextChapter: "nr-1-nephi-15",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-1-nephi-15",
+    title: "Chapter 15",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Chapter 15",
+    order: 15,
+    parent: "nr-1-nephi",
+    previousChapter: "nr-1-nephi-14",
+    nextChapter: "nr-1-nephi-16",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-1-nephi-16",
+    title: "Chapter 16",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Chapter 16",
+    order: 16,
+    parent: "nr-1-nephi",
+    previousChapter: "nr-1-nephi-15",
+    nextChapter: "nr-1-nephi-17",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-1-nephi-17",
+    title: "Chapter 17",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Chapter 17",
+    order: 17,
+    parent: "nr-1-nephi",
+    previousChapter: "nr-1-nephi-16",
+    nextChapter: "nr-1-nephi-18",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-1-nephi-18",
+    title: "Chapter 18",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Chapter 18",
+    order: 18,
+    parent: "nr-1-nephi",
+    previousChapter: "nr-1-nephi-17",
+    nextChapter: "nr-1-nephi-16",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-1-nephi-19",
+    title: "Chapter 19",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Chapter 19",
+    order: 19,
+    parent: "nr-1-nephi",
+    previousChapter: "nr-1-nephi-18",
+    nextChapter: "nr-1-nephi-21",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-1-nephi-20",
+    title: "Chapter 20",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Chapter 20",
+    order: 20,
+    parent: "nr-1-nephi",
+    previousChapter: "nr-1-nephi-19",
+    nextChapter: "nr-1-nephi-21",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-1-nephi-21",
+    title: "Chapter 21",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Chapter 21",
+    order: 21,
+    parent: "nr-1-nephi",
+    previousChapter: "nr-1-nephi-20",
+    nextChapter: "nr-1-nephi-22",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-1-nephi-22",
+    title: "Chapter 22",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Chapter 22",
+    order: 22,
+    parent: "nr-1-nephi",
+    previousChapter: "nr-1-nephi-21",
+    nextChapter: "nr-2-nephi-1",
+    visible: true
+  }
+  addChapter(chapter);
+
+
+
+
+
+
+  book = {
+    id: "nr-2-Nephi",
+    title: "The Second Book of Nephi",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/2-nephi-thumbnail.jpg",
+    thumbnailTitle: "2 Nephi",
+    isParent: false,
+    hasChildBooks: false,
+    order: 3,
+    parent: "the-nephite-record",
+    visible: true
+  }
+  addBook(book);
+
+  book = {
+    id: "nr-Jacob",
+    title: "The Book of Jacob",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/jacob-thumbnail.jpg",
+    thumbnailTitle: "Jacob",
+    isParent: false,
+    hasChildBooks: false,
+    order: 4,
+    parent: "the-nephite-record",
+    visible: true
+  }
+  addBook(book);
+
+  book = {
+    id: "nr-Enos",
+    title: "The Book of Enos",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/enos-thumbnail.jpg",
+    thumbnailTitle: "Enos",
+    isParent: false,
+    hasChildBooks: false,
+    order: 5,
+    parent: "the-nephite-record",
+    visible: true
+  }
+  addBook(book);
+
+  book = {
+    id: "nr-Jarom",
+    title: "The Book of Jarom",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/jarom-thumbnail.jpg",
+    thumbnailTitle: "Jarom",
+    isParent: false,
+    hasChildBooks: false,
+    order: 6,
+    parent: "the-nephite-record",
+    visible: true
+  }
+  addBook(book);
+
+  book = {
+    id: "nr-Omni",
+    title: "The Book of Omni",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/omni-thumbnail.jpg",
+    thumbnailTitle: "Omni",
+    isParent: false,
+    hasChildBooks: false,
+    order: 7,
+    parent: "the-nephite-record",
+    visible: true
+  }
+  addBook(book);
+
+  book = {
+    id: "nr-words-of-mormon",
+    title: "Words of Mormon",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/words-of-mormon-thumbnail.jpg",
+    thumbnailTitle: "Words of Mormon",
+    isParent: false,
+    hasChildBooks: false,
+    order: 8,
+    parent: "the-nephite-record",
+    visible: true
+  }
+  addBook(book);
+
+  book = {
+    id: "nr-mosiah",
+    title: "The Book of Mosiah",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/mosiah-thumbnail.jpg",
+    thumbnailTitle: "Mosiah",
+    isParent: false,
+    hasChildBooks: false,
+    order: 9,
+    parent: "the-nephite-record",
+    visible: true
+  }
+  addBook(book);
+
+  book = {
+    id: "nr-alma",
+    title: "The Book of Alma",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/alma-thumbnail.jpg",
+    thumbnailTitle: "Alma",
+    isParent: false,
+    hasChildBooks: false,
+    order: 10,
+    parent: "the-nephite-record",
+    visible: true
+  }
+  addBook(book);
+
+  book = {
+    id: "nr-helaman",
+    title: "The Book of Helaman",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/helaman-thumbnail.jpg",
+    thumbnailTitle: "Helaman",
+    isParent: false,
+    hasChildBooks: false,
+    order: 11,
+    parent: "the-nephite-record",
+    visible: true
+  }
+  addBook(book);
+
+  book = {
+    id: "nr-3-Nephi",
+    title: "The Third Book of Nephi",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/3-nephi-thumbnail.jpg",
+    thumbnailTitle: "3 Nephi",
+    isParent: false,
+    hasChildBooks: false,
+    order: 12,
+    parent: "the-nephite-record",
+    visible: true
+  }
+  addBook(book);
+
+  book = {
+    id: "nr-4-Nephi",
+    title: "The Fourth Book of Nephi",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/4-nephi-thumbnail.jpg",
+    thumbnailTitle: "4 Nephi",
+    isParent: false,
+    hasChildBooks: false,
+    order: 13,
+    parent: "the-nephite-record",
+    visible: true
+  }
+  addBook(book);
+
+  book = {
+    id: "nr-mormon",
+    title: "The Book of Mormon",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/mormon-thumbnail.jpg",
+    thumbnailTitle: "Mormon",
+    isParent: false,
+    hasChildBooks: false,
+    order: 14,
+    parent: "the-nephite-record",
+    visible: true
+  }
+  addBook(book);
+
+  book = {
+    id: "nr-ether",
+    title: "The Book of Ether",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/ether-thumbnail.jpg",
+    thumbnailTitle: "Ether",
+    isParent: false,
+    hasChildBooks: false,
+    order: 15,
+    parent: "the-nephite-record",
+    visible: true
+  }
+  addBook(book);
+
+  book = {
+    id: "nr-moroni",
+    title: "The Book of Moroni",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/moroni-thumbnail.jpg",
+    thumbnailTitle: "Moroni",
+    isParent: false,
+    hasChildBooks: false,
+    order: 16,
+    parent: "the-nephite-record",
+    visible: true
+  }
+  addBook(book);
+
+
+  book = {
+    id: "the-oral-torah",
+    title: "The Oral Torah",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/the-oral-torah-2.jpg",
+    thumbnailTitle: "Oral Torah",
+    isParent: true,
+    hasChildBooks: true,
+    order: 2,
+    parent: "",
+    visible: true
+  }
+  addBook(book);
+
+  book = {
+    id: "the-new-testament",
+    title: "The New Testament",
+    subTitle: "KJV",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament-kjv-thumbnail-2.jpg",
+    thumbnailTitle: "",
+    isParent: true,
+    hasChildBooks: true,
+    order: 3,
+    parent: "",
+    visible: true
+  }
+  addBook(book);
+
+
+  book = {
+    id: "nt-matthew",
+    title: "The Gospel According to St Matthew",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/matthew-thumbnail.jpg",
+    thumbnailTitle: "Matthew",
+    isParent: false,
+    hasChildBooks: false,
+    order: 1,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+
+  book = {
+    id: "nt-mark",
+    title: "The Gospel According to St Mark",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/mark-thumbnail.jpg",
+    thumbnailTitle: "Mark",
+    isParent: false,
+    hasChildBooks: false,
+    order: 2,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+
+  book = {
+    id: "nt-luke",
+    title: "The Gospel According to St Luke",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/luke-thumbnail.jpg",
+    thumbnailTitle: "Luke",
+    isParent: false,
+    hasChildBooks: false,
+    order: 3,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+  book = {
+    id: "nt-john",
+    title: "The Gospel According to St John",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/john-thumbnail.jpg",
+    thumbnailTitle: "John",
+    isParent: false,
+    hasChildBooks: false,
+    order: 4,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+  book = {
+    id: "nt-acts",
+    title: "The Acts of the Apostles",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/acts-thumbnail.jpg",
+    thumbnailTitle: "Acts",
+    isParent: false,
+    hasChildBooks: false,
+    order: 5,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+  book = {
+    id: "nt-romans",
+    title: "The Epistle of Paul the Apostle to the Romans",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/romans-thumbnail.jpg",
+    thumbnailTitle: "Romans",
+    isParent: false,
+    hasChildBooks: false,
+    order: 6,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+  book = {
+    id: "nt-1-corinthians",
+    title: "The First Epistle of Paul the Apostle to the Corintians",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/first-corinthians-thumbnail.jpg",
+    thumbnailTitle: "1 Corinthians",
+    isParent: false,
+    hasChildBooks: false,
+    order: 7,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+  book = {
+    id: "nt-2-corinthians",
+    title: "The Second Epistle of Paul the Apostle to the Corintians",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/second-corinthians-thumbnail.jpg",
+    thumbnailTitle: "2 Corinthians",
+    isParent: false,
+    hasChildBooks: false,
+    order: 8,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+  book = {
+    id: "nt-galations",
+    title: "The Epistle of Paul the Apostle to the Galatians",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/galatians-thumbnail.jpg",
+    thumbnailTitle: "Galatians",
+    isParent: false,
+    hasChildBooks: false,
+    order: 9,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+  book = {
+    id: "nt-ephesians",
+    title: "The Epistle of Paul the Apostle to the Ephesians",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/ephesians-thumbnail.jpg",
+    thumbnailTitle: "Ephesians",
+    isParent: false,
+    hasChildBooks: false,
+    order: 10,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+  book = {
+    id: "nt-philippians",
+    title: "The Epistle of Paul the Apostle to the Philippians",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/philippians-thumbnail.jpg",
+    thumbnailTitle: "Philippians",
+    isParent: false,
+    hasChildBooks: false,
+    order: 11,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+  book = {
+    id: "nt-colossians",
+    title: "The Epistle of Paul the Apostle to the Colossians",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/colossians-thumbnail.jpg",
+    thumbnailTitle: "Colossians",
+    isParent: false,
+    hasChildBooks: false,
+    order: 12,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+  book = {
+    id: "nt-1-thessalonians",
+    title: "The First Epistle of Paul the Apostle to the Thessalonians",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/first-thessalonians-thumbnail.jpg",
+    thumbnailTitle: "1 Thessalonians",
+    isParent: false,
+    hasChildBooks: false,
+    order: 13,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+  book = {
+    id: "nt-2-thessalonians",
+    title: "The Second Epistle of Paul the Apostle to the Thessalonians",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/second-thessalonians.jpg",
+    thumbnailTitle: "2 Thessalonians",
+    isParent: false,
+    hasChildBooks: false,
+    order: 14,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+  book = {
+    id: "nt-1-timothy",
+    title: "The First Epistle of Paul the Apostle to Timothy",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/first-timothy-thumbnail.jpg",
+    thumbnailTitle: "1 Timothy",
+    isParent: false,
+    hasChildBooks: false,
+    order: 15,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+  book = {
+    id: "nt-2-timothy",
+    title: "The Second Epistle of Paul the Apostle to Timothy",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/second-timothy-thumbnail.jpg",
+    thumbnailTitle: "2 Timothy",
+    isParent: false,
+    hasChildBooks: false,
+    order: 16,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+  book = {
+    id: "nt-titus",
+    title: "The Epistle of Paul to Titus",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/titus-thumbnail.jpg",
+    thumbnailTitle: "Titus",
+    isParent: false,
+    hasChildBooks: false,
+    order: 17,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+  book = {
+    id: "nt-philemon",
+    title: "The Epistle of Paul to Philemon",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/philemon-thumbnail.jpg",
+    thumbnailTitle: "Philemon",
+    isParent: false,
+    hasChildBooks: false,
+    order: 18,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+  book = {
+    id: "nt-hebrews",
+    title: "The Epistle of Paul the Apostle to the Hebrews",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/hebrews-thumbnail.jpg",
+    thumbnailTitle: "Hebrews",
+    isParent: false,
+    hasChildBooks: false,
+    order: 19,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+  book = {
+    id: "nt-james",
+    title: "The General Epistle of James",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/james-thumbnail.jpg",
+    thumbnailTitle: "James",
+    isParent: false,
+    hasChildBooks: false,
+    order: 20,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+  book = {
+    id: "nt-1-peter",
+    title: "The First Epistle General of Peter",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/first-peter-thumbnail.jpg",
+    thumbnailTitle: "1 Peter",
+    isParent: false,
+    hasChildBooks: false,
+    order: 21,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+  book = {
+    id: "nt-2-peter",
+    title: "The Second Epistle General of Peter",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/second-peter.jpg",
+    thumbnailTitle: "2 Peter",
+    isParent: false,
+    hasChildBooks: false,
+    order: 22,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+  book = {
+    id: "nt-1-john",
+    title: "The First Epistle of John",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/first-john-thumbnail.jpg",
+    thumbnailTitle: "1 John",
+    isParent: false,
+    hasChildBooks: false,
+    order: 23,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+  book = {
+    id: "nt-2-john",
+    title: "The Second Epistle of John",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/second-john-thumbnail.jpg",
+    thumbnailTitle: "2 John",
+    isParent: false,
+    hasChildBooks: false,
+    order: 24,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+
+  book = {
+    id: "nt-3-john",
+    title: "The Third Epistle of John",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/third-john-thumbnail.jpg",
+    thumbnailTitle: "3 John",
+    isParent: false,
+    hasChildBooks: false,
+    order: 24,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+  book = {
+    id: "nt-jude",
+    title: "The General Epistle of Jude",
+    subTitle: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/jude-thumbnail.jpg",
+    thumbnailTitle: "Jude",
+    isParent: false,
+    hasChildBooks: false,
+    order: 26,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+  book = {
+    id: "nt-revelation",
+    title: "The Revelation of St John the Divine",
+    subTitle: "",
+    thumbnailTitle: "Revelation",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/new-testament/revelation-thumbnail.jpg",
+    isParent: false,
+    hasChildBooks: false,
+    order: 27,
+    parent: "the-new-testament",
+    visible: true
+  }
+  addBook(book);
+
+
+
+  book = {
+    id: "the-doctrine-and-covenants",
+    title: "The Doctrine and Covenants",
+    subTitle: "1844 - Nauvoo Edition",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/doctrine%26covenants-1844-thumbnail-2.jpg",
+    thumbnailTitle: "D&C-1844",
+    isParent: true,
+    hasChildBooks: false,
+    order: 4,
+    parent: "",
+    visible: true
+  }
+  addBook(book);
+
+  chapter = {
+    id: "dc-introduction",
+    title: "Introduction",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Introduction",
+    order: 1,
+    parent: "the-doctrine-and-covenants",
+    previousChapter: "",
+    nextChapter: "dc-lectures-1",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "dc-lectures-1",
+    title: "Lectures on Faith",
+    subTitle: "Chapter 1",
+    thumbnail: "",
+    thumbnailTitle: "Lecture 1",
+    order: 2,
+    parent: "the-doctrine-and-covenants",
+    previousChapter: "dc-introduction",
+    nextChapter: "dc-lectures-2",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "dc-lectures-2",
+    title: "Lectures on Faith",
+    subTitle: "Chapter 2",
+    thumbnail: "",
+    thumbnailTitle: "Lecture 2",
+    order: 3,
+    parent: "the-doctrine-and-covenants",
+    previousChapter: "dc-lectures-1",
+    nextChapter: "dc-lectures-2",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "dc-lectures-3",
+    title: "Lectures on Faith",
+    subTitle: "Chapter 3",
+    thumbnail: "",
+    thumbnailTitle: "Lecture 3",
+    order: 4,
+    parent: "the-doctrine-and-covenants",
+    previousChapter: "dc-lectures-2",
+    nextChapter: "dc-lectures-4",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "dc-lectures-4",
+    title: "Lectures on Faith",
+    subTitle: "Chapter 4",
+    thumbnail: "",
+    thumbnailTitle: "Lecture 4",
+    order: 5,
+    parent: "the-doctrine-and-covenants",
+    previousChapter: "dc-lectures-3",
+    nextChapter: "dc-lectures-5",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "dc-lectures-5",
+    title: "Lectures on Faith",
+    subTitle: "Chapter 5",
+    thumbnail: "",
+    thumbnailTitle: "Lecture 5",
+    order: 6,
+    parent: "the-doctrine-and-covenants",
+    previousChapter: "dc-lectures-4",
+    nextChapter: "dc-section-1",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "dc-section-1",
+    title: "Section 1",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Section 1",
+    order: 7,
+    parent: "the-doctrine-and-covenants",
+    previousChapter: "dc-lectures-5",
+    nextChapter: "dc-section-2",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "dc-section-2",
+    title: "Section 2",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Section 2",
+    order: 8,
+    parent: "the-doctrine-and-covenants",
+    previousChapter: "dc-section-1",
+    nextChapter: "dc-section-3",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "dc-section-3",
+    title: "Section 3",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Section 3",
+    order: 9,
+    parent: "the-doctrine-and-covenants",
+    previousChapter: "dc-section-2",
+    nextChapter: "dc-section-4",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "dc-section-4",
+    title: "Section 4",
+    subTitle: "",
+    thumbnail: "",
+    thumbnailTitle: "Section 4",
+    order: 10,
+    parent: "the-doctrine-and-covenants",
+    previousChapter: "dc-section-3",
+    nextChapter: "dc-section-5",
+    visible: true
+  }
+  addChapter(chapter);
+
+
+  console.log("Books Added");
+  res.send(
+    JSON.stringify({
+      "message": "success"
+    })
+  );
+});
+
 
 module.exports = router;
 

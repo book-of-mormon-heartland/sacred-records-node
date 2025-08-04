@@ -53,16 +53,12 @@ function addUser( user ) {
 
 function addBook( book ) {
   const docRef = db.collection('books').doc(book.id);
-  docRef.set({
-    title: book.title,
-    subTitle: book.subTitle,
-    thumbnail: book.thumbnail,
-    isParent: book.isParent,
-    order: book.order,
-    id: book.id,
-    parent: book.parent,
-    visible: book.visible
-  });     //console.log('Google User Added Successfully!');
+  docRef.set(book);     //console.log('Google User Added Successfully!');
+}
+
+function addChapter( chapter ) {
+  const docRef = db.collection('chapters').doc(chapter.id);
+  docRef.set(chapter);     //console.log('Google User Added Successfully!');
 }
 
 
@@ -88,6 +84,7 @@ module.exports = {
   db,
   addUser,
   addBook,
+  addChapter,
   addToken,
   removeToken
 };
