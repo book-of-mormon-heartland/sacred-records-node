@@ -139,35 +139,12 @@ router.post('/POST/refreshtoken', (req, res) => {
 
 });
 
-router.get('/GET/books', (req, res) => {
-
-  console.log("GET /GET/books called");
-  
-   db.collection('books').where("isParent", "==", true).orderBy("order", "asc").get()
-    .then(snapshot => {
-      if (snapshot.empty) {
-        console.log('No matching documents.');
-        return res.status(404).send('No Matching found');
-      }
-
-      let users = [];
-      snapshot.forEach(doc => {
-        users.push({ id: doc.id, ...doc.data() });
-      });
-      return res.json(users);
-    })
-    .catch(err => {
-      console.error('Error getting documents', err);
-      return res.status(500).send('Error retrieving users');
-    });
-});
-
 router.get('/GET/book', (req, res) => {
   let bookId = req.query.bookid;
   console.log("bookId " + bookId);
   console.log("GET /GET/book called");
   
-  db.collection('books').where("parent", "==", bookId ).orderBy("order", "asc").get()
+  db.collection('books').where("parent", "==", bookId ).where("visible", "==", true).orderBy("order", "asc").get()
     .then(snapshot => {
       if (snapshot.empty) {
         console.log('No matching documents.');
@@ -187,6 +164,58 @@ router.get('/GET/book', (req, res) => {
     });
     
 });
+
+router.get('/GET/books', (req, res) => {
+
+  console.log("GET /GET/books called");
+  
+   db.collection('books').where("isParent", "==", true).where("visible", "==", true).orderBy("order", "asc").get()
+    .then(snapshot => {
+      if (snapshot.empty) {
+        console.log('No matching documents.');
+        return res.status(404).send('No Matching found');
+      }
+
+      let users = [];
+      snapshot.forEach(doc => {
+        users.push({ id: doc.id, ...doc.data() });
+      });
+      return res.json(users);
+    })
+    .catch(err => {
+      console.error('Error getting documents', err);
+      return res.status(500).send('Error retrieving users');
+    });
+});
+
+
+router.get('/GET/chapters', (req, res) => {
+
+  console.log("GET /GET/chapters called");
+  let parent = req.query.parent;
+  console.log("parent " + parent);
+  
+  db.collection('chapters').where("parent", "==", parent).orderBy("order", "asc").get()
+    .then(snapshot => {
+      if (snapshot.empty) {
+        console.log('No matching documents.');
+        return res.status(404).send('No Matching found');
+      }
+
+      let chapters = [];
+      snapshot.forEach(doc => {
+        chapters.push({ id: doc.id, ...doc.data() });
+      });
+      return res.json(chapters);
+    })
+    .catch(err => {
+      console.error('Error getting documents', err);
+      return res.status(500).send('Error retrieving users');
+    });
+});
+
+
+
 
 // GET all users
 router.get('/GET/users', (req, res) => {
@@ -297,7 +326,7 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-introduction",
     title: "Introduction",
     subTitle: "",
-    thumbnail: "",
+    thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/intro-thumbnail.jpg",
     thumbnailTitle: "Intro",
     isParent: false,
     hasChildBooks: false,
@@ -311,12 +340,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-intro-title-page",
     title: "Title Page",
     subTitle: "",
-    thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/intro-thumbnail.jpg",
-    thumbnailTitle: "Title Page",
     order: 1,
     parent: "nr-introduction",
-    previousChapter: "",
-    nextChapter: "nr-intro-three-witnesses",
     visible: true
   }
   addChapter(chapter);
@@ -325,12 +350,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-intro-three-witnesses",
     title: "The Three Witnesses",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Three Witnesses",
     order: 2,
     parent: "nr-introduction",
-    previousChapter: "nr-intro-title-page",
-    nextChapter: "nr-intro-eight-witnesses",
     visible: true
   }
   addChapter(chapter);
@@ -338,12 +359,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-intro-eight-witnesses",
     title: "The Eight Witnesses",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "The Eight Witnesses",
     order: 3,
     parent: "nr-introduction",
-    previousChapter: "nr-intro-three-witnesses",
-    nextChapter: "nr-1-nephi-1",
     visible: true
   }
   addChapter(chapter);
@@ -368,12 +385,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-1-nephi-1",
     title: "Chapter 1",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Chapter 1",
     order: 1,
     parent: "nr-1-nephi",
-    previousChapter: "nr-intro-eight-witnesses",
-    nextChapter: "nr-1-nephi-2",
     visible: true
   }
   addChapter(chapter);
@@ -382,12 +395,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-1-nephi-2",
     title: "Chapter 2",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Chapter 2",
     order: 2,
     parent: "nr-1-nephi",
-    previousChapter: "nr-1-nephi-1",
-    nextChapter: "nr-1-nephi-3",
     visible: true
   }
   addChapter(chapter);
@@ -395,12 +404,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-1-nephi-3",
     title: "Chapter 3",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Chapter 3",
     order: 3,
     parent: "nr-1-nephi",
-    previousChapter: "nr-1-nephi-2",
-    nextChapter: "nr-1-nephi-4",
     visible: true
   }
   addChapter(chapter);
@@ -408,12 +413,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-1-nephi-4",
     title: "Chapter 4",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Chapter 4",
     order: 4,
     parent: "nr-1-nephi",
-    previousChapter: "nr-1-nephi-3",
-    nextChapter: "nr-1-nephi-5",
     visible: true
   }
   addChapter(chapter);
@@ -421,12 +422,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-1-nephi-5",
     title: "Chapter 5",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Chapter 5",
     order: 5,
     parent: "nr-1-nephi",
-    previousChapter: "nr-1-nephi-4",
-    nextChapter: "nr-1-nephi-6",
     visible: true
   }
   addChapter(chapter);
@@ -434,12 +431,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-1-nephi-6",
     title: "Chapter 6",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Chapter 6",
     order: 6,
     parent: "nr-1-nephi",
-    previousChapter: "nr-1-nephi-5",
-    nextChapter: "nr-1-nephi-7",
     visible: true
   }
   addChapter(chapter);
@@ -447,12 +440,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-1-nephi-7",
     title: "Chapter 7",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Chapter 7",
     order: 7,
     parent: "nr-1-nephi",
-    previousChapter: "nr-1-nephi-6",
-    nextChapter: "nr-1-nephi-8",
     visible: true
   }
   addChapter(chapter);
@@ -460,12 +449,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-1-nephi-8",
     title: "Chapter 8",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Chapter 8",
     order: 8,
     parent: "nr-1-nephi",
-    previousChapter: "nr-1-nephi-7",
-    nextChapter: "nr-1-nephi-9",
     visible: true
   }
   addChapter(chapter);
@@ -473,12 +458,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-1-nephi-9",
     title: "Chapter 9",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Chapter 9",
     order: 9,
     parent: "nr-1-nephi",
-    previousChapter: "nr-1-nephi-8",
-    nextChapter: "nr-1-nephi-10",
     visible: true
   }
   addChapter(chapter);
@@ -486,12 +467,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-1-nephi-10",
     title: "Chapter 10",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Chapter 10",
     order: 10,
     parent: "nr-1-nephi",
-    previousChapter: "nr-1-nephi-9",
-    nextChapter: "nr-1-nephi-11",
     visible: true
   }
   addChapter(chapter);
@@ -499,12 +476,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-1-nephi-11",
     title: "Chapter 11",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Chapter 11",
     order: 11,
     parent: "nr-1-nephi",
-    previousChapter: "nr-1-nephi-10",
-    nextChapter: "nr-1-nephi-12",
     visible: true
   }
   addChapter(chapter);
@@ -512,12 +485,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-1-nephi-12",
     title: "Chapter 12",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Chapter 12",
     order: 12,
     parent: "nr-1-nephi",
-    previousChapter: "nr-1-nephi-11",
-    nextChapter: "nr-1-nephi-13",
     visible: true
   }
   addChapter(chapter);
@@ -525,12 +494,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-1-nephi-13",
     title: "Chapter 13",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Chapter 13",
     order: 13,
     parent: "nr-1-nephi",
-    previousChapter: "nr-1-nephi-12",
-    nextChapter: "nr-1-nephi-14",
     visible: true
   }
   addChapter(chapter);
@@ -538,12 +503,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-1-nephi-14",
     title: "Chapter 14",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Chapter 14",
     order: 14,
     parent: "nr-1-nephi",
-    previousChapter: "nr-1-nephi-13",
-    nextChapter: "nr-1-nephi-15",
     visible: true
   }
   addChapter(chapter);
@@ -551,12 +512,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-1-nephi-15",
     title: "Chapter 15",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Chapter 15",
     order: 15,
     parent: "nr-1-nephi",
-    previousChapter: "nr-1-nephi-14",
-    nextChapter: "nr-1-nephi-16",
     visible: true
   }
   addChapter(chapter);
@@ -564,12 +521,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-1-nephi-16",
     title: "Chapter 16",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Chapter 16",
     order: 16,
     parent: "nr-1-nephi",
-    previousChapter: "nr-1-nephi-15",
-    nextChapter: "nr-1-nephi-17",
     visible: true
   }
   addChapter(chapter);
@@ -577,12 +530,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-1-nephi-17",
     title: "Chapter 17",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Chapter 17",
     order: 17,
     parent: "nr-1-nephi",
-    previousChapter: "nr-1-nephi-16",
-    nextChapter: "nr-1-nephi-18",
     visible: true
   }
   addChapter(chapter);
@@ -590,12 +539,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-1-nephi-18",
     title: "Chapter 18",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Chapter 18",
     order: 18,
     parent: "nr-1-nephi",
-    previousChapter: "nr-1-nephi-17",
-    nextChapter: "nr-1-nephi-16",
     visible: true
   }
   addChapter(chapter);
@@ -603,12 +548,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-1-nephi-19",
     title: "Chapter 19",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Chapter 19",
     order: 19,
     parent: "nr-1-nephi",
-    previousChapter: "nr-1-nephi-18",
-    nextChapter: "nr-1-nephi-21",
     visible: true
   }
   addChapter(chapter);
@@ -616,12 +557,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-1-nephi-20",
     title: "Chapter 20",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Chapter 20",
     order: 20,
     parent: "nr-1-nephi",
-    previousChapter: "nr-1-nephi-19",
-    nextChapter: "nr-1-nephi-21",
     visible: true
   }
   addChapter(chapter);
@@ -629,12 +566,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-1-nephi-21",
     title: "Chapter 21",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Chapter 21",
     order: 21,
     parent: "nr-1-nephi",
-    previousChapter: "nr-1-nephi-20",
-    nextChapter: "nr-1-nephi-22",
     visible: true
   }
   addChapter(chapter);
@@ -642,23 +575,16 @@ router.get('/GET/addBooks', (req, res) => {
     id: "nr-1-nephi-22",
     title: "Chapter 22",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Chapter 22",
     order: 22,
     parent: "nr-1-nephi",
-    previousChapter: "nr-1-nephi-21",
-    nextChapter: "nr-2-nephi-1",
     visible: true
   }
   addChapter(chapter);
 
 
 
-
-
-
   book = {
-    id: "nr-2-Nephi",
+    id: "nr-2-nephi",
     title: "The Second Book of Nephi",
     subTitle: "",
     thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/2-nephi-thumbnail.jpg",
@@ -671,8 +597,308 @@ router.get('/GET/addBooks', (req, res) => {
   }
   addBook(book);
 
+  chapter = {
+    id: "nr-2-nephi-1",
+    title: "Chapter 1",
+    subTitle: "",
+    order: 1,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+
+  chapter = {
+    id: "nr-2-nephi-2",
+    title: "Chapter 2",
+    subTitle: "",
+    order: 2,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-3",
+    title: "Chapter 3",
+    subTitle: "",
+    order: 3,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-4",
+    title: "Chapter 4",
+    subTitle: "",
+    order: 4,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-5",
+    title: "Chapter 5",
+    subTitle: "",
+    order: 5,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-6",
+    title: "Chapter 6",
+    subTitle: "",
+    order: 6,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-7",
+    title: "Chapter 7",
+    subTitle: "",
+    order: 7,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-8",
+    title: "Chapter 8",
+    subTitle: "",
+    order: 8,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-9",
+    title: "Chapter 9",
+    subTitle: "",
+    order: 9,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-10",
+    title: "Chapter 10",
+    subTitle: "",
+    order: 10,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-11",
+    title: "Chapter 11",
+    subTitle: "",
+    order: 11,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-12",
+    title: "Chapter 12",
+    subTitle: "",
+    order: 12,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-13",
+    title: "Chapter 13",
+    subTitle: "",
+    order: 13,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-14",
+    title: "Chapter 14",
+    subTitle: "",
+    order: 14,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-15",
+    title: "Chapter 15",
+    subTitle: "",
+    order: 15,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-16",
+    title: "Chapter 16",
+    subTitle: "",
+    order: 16,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-17",
+    title: "Chapter 17",
+    subTitle: "",
+    order: 17,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-18",
+    title: "Chapter 18",
+    subTitle: "",
+    order: 18,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-19",
+    title: "Chapter 19",
+    subTitle: "",
+    order: 19,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-20",
+    title: "Chapter 20",
+    subTitle: "",
+    order: 20,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-21",
+    title: "Chapter 21",
+    subTitle: "",
+    order: 21,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-22",
+    title: "Chapter 22",
+    subTitle: "",
+    order: 22,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-23",
+    title: "Chapter 23",
+    subTitle: "",
+    order: 23,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-24",
+    title: "Chapter 24",
+    subTitle: "",
+    order: 24,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-25",
+    title: "Chapter 25",
+    subTitle: "",
+    order: 25,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-26",
+    title: "Chapter 26",
+    subTitle: "",
+    order: 26,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-27",
+    title: "Chapter 27",
+    subTitle: "",
+    order: 27,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-28",
+    title: "Chapter 28",
+    subTitle: "",
+    order: 28,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-29",
+    title: "Chapter 29",
+    subTitle: "",
+    order: 29,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-30",
+    title: "Chapter 30",
+    subTitle: "",
+    order: 30,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-31",
+    title: "Chapter 31",
+    subTitle: "",
+    order: 31,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-32",
+    title: "Chapter 32",
+    subTitle: "",
+    order: 32,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-2-nephi-33",
+    title: "Chapter 33",
+    subTitle: "",
+    order: 33,
+    parent: "nr-2-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+
+
   book = {
-    id: "nr-Jacob",
+    id: "nr-jacob",
     title: "The Book of Jacob",
     subTitle: "",
     thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/jacob-thumbnail.jpg",
@@ -685,8 +911,74 @@ router.get('/GET/addBooks', (req, res) => {
   }
   addBook(book);
 
+
+  chapter = {
+    id: "nr-jacob-1",
+    title: "Chapter 1",
+    subTitle: "",
+    order: 1,
+    parent: "nr-jacob",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-jacob-2",
+    title: "Chapter 2",
+    subTitle: "",
+    order: 2,
+    parent: "nr-jacob",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-jacob-3",
+    title: "Chapter 3",
+    subTitle: "",
+    order: 3,
+    parent: "nr-jacob",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-jacob-4",
+    title: "Chapter 4",
+    subTitle: "",
+    order: 4,
+    parent: "nr-jacob",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-jacob-5",
+    title: "Chapter 5",
+    subTitle: "",
+    order: 5,
+    parent: "nr-jacob",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-jacob-6",
+    title: "Chapter 6",
+    subTitle: "",
+    order: 6,
+    parent: "nr-jacob",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-jacob-7",
+    title: "Chapter 7",
+    subTitle: "",
+    order: 7,
+    parent: "nr-jacob",
+    visible: true
+  }
+  addChapter(chapter);
+
+
   book = {
-    id: "nr-Enos",
+    id: "nr-enos",
     title: "The Book of Enos",
     subTitle: "",
     thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/enos-thumbnail.jpg",
@@ -699,8 +991,19 @@ router.get('/GET/addBooks', (req, res) => {
   }
   addBook(book);
 
+  chapter = {
+    id: "nr-enos-1",
+    title: "Chapter 1",
+    subTitle: "",
+    order: 1,
+    parent: "nr-enos",
+    visible: true
+  }
+  addChapter(chapter);
+
+
   book = {
-    id: "nr-Jarom",
+    id: "nr-jarom",
     title: "The Book of Jarom",
     subTitle: "",
     thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/jarom-thumbnail.jpg",
@@ -713,8 +1016,20 @@ router.get('/GET/addBooks', (req, res) => {
   }
   addBook(book);
 
+  chapter = {
+    id: "nr-jarom-1",
+    title: "Chapter 1",
+    subTitle: "",
+    order: 1,
+    parent: "nr-jarom",
+    visible: true
+  }
+  addChapter(chapter);
+
+
+
   book = {
-    id: "nr-Omni",
+    id: "nr-omni",
     title: "The Book of Omni",
     subTitle: "",
     thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/omni-thumbnail.jpg",
@@ -726,6 +1041,18 @@ router.get('/GET/addBooks', (req, res) => {
     visible: true
   }
   addBook(book);
+
+  chapter = {
+    id: "nr-omni-1",
+    title: "Chapter 1",
+    subTitle: "",
+    order: 1,
+    parent: "nr-omni",
+    visible: true
+  }
+  addChapter(chapter);
+
+
 
   book = {
     id: "nr-words-of-mormon",
@@ -741,6 +1068,17 @@ router.get('/GET/addBooks', (req, res) => {
   }
   addBook(book);
 
+  chapter = {
+    id: "nr-words-of-mormon-1",
+    title: "Chapter 1",
+    subTitle: "",
+    order: 1,
+    parent: "nr-words-of-mormon",
+    visible: true
+  }
+  addChapter(chapter);
+
+
   book = {
     id: "nr-mosiah",
     title: "The Book of Mosiah",
@@ -754,6 +1092,271 @@ router.get('/GET/addBooks', (req, res) => {
     visible: true
   }
   addBook(book);
+
+  chapter = {
+    id: "nr-mosiah-1",
+    title: "Chapter 1",
+    subTitle: "",
+    order: 1,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+
+  chapter = {
+    id: "nr-mosiah-2",
+    title: "Chapter 2",
+    subTitle: "",
+    order: 2,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-3",
+    title: "Chapter 3",
+    subTitle: "",
+    order: 3,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-4",
+    title: "Chapter 4",
+    subTitle: "",
+    order: 4,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-5",
+    title: "Chapter 5",
+    subTitle: "",
+    order: 5,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-6",
+    title: "Chapter 6",
+    subTitle: "",
+    order: 6,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-7",
+    title: "Chapter 7",
+    subTitle: "",
+    order: 7,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-8",
+    title: "Chapter 8",
+    subTitle: "",
+    order: 8,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-9",
+    title: "Chapter 9",
+    subTitle: "",
+    order: 9,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-10",
+    title: "Chapter 10",
+    subTitle: "",
+    order: 10,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-11",
+    title: "Chapter 11",
+    subTitle: "",
+    order: 11,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-12",
+    title: "Chapter 12",
+    subTitle: "",
+    order: 12,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-13",
+    title: "Chapter 13",
+    subTitle: "",
+    order: 13,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-14",
+    title: "Chapter 14",
+    subTitle: "",
+    order: 14,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-15",
+    title: "Chapter 15",
+    subTitle: "",
+    order: 15,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-16",
+    title: "Chapter 16",
+    subTitle: "",
+    order: 16,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-17",
+    title: "Chapter 17",
+    subTitle: "",
+    order: 17,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-18",
+    title: "Chapter 18",
+    subTitle: "",
+    order: 18,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-19",
+    title: "Chapter 19",
+    subTitle: "",
+    order: 19,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-20",
+    title: "Chapter 20",
+    subTitle: "",
+    order: 20,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-21",
+    title: "Chapter 21",
+    subTitle: "",
+    order: 21,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-22",
+    title: "Chapter 22",
+    subTitle: "",
+    order: 22,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-23",
+    title: "Chapter 23",
+    subTitle: "",
+    order: 23,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-24",
+    title: "Chapter 24",
+    subTitle: "",
+    order: 24,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-25",
+    title: "Chapter 25",
+    subTitle: "",
+    order: 25,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-26",
+    title: "Chapter 26",
+    subTitle: "",
+    order: 26,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-27",
+    title: "Chapter 27",
+    subTitle: "",
+    order: 27,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-28",
+    title: "Chapter 28",
+    subTitle: "",
+    order: 28,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mosiah-29",
+    title: "Chapter 29",
+    subTitle: "",
+    order: 29,
+    parent: "nr-mosiah",
+    visible: true
+  }
+  addChapter(chapter);
+
+
 
   book = {
     id: "nr-alma",
@@ -769,6 +1372,577 @@ router.get('/GET/addBooks', (req, res) => {
   }
   addBook(book);
 
+  chapter = {
+    id: "nr-alma-1",
+    title: "Chapter 1",
+    subTitle: "",
+    order: 1,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+
+  chapter = {
+    id: "nr-alma-2",
+    title: "Chapter 2",
+    subTitle: "",
+    order: 2,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-3",
+    title: "Chapter 3",
+    subTitle: "",
+    order: 3,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-4",
+    title: "Chapter 4",
+    subTitle: "",
+    order: 4,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-5",
+    title: "Chapter 5",
+    subTitle: "",
+    order: 5,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-6",
+    title: "Chapter 6",
+    subTitle: "",
+    order: 6,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-7",
+    title: "Chapter 7",
+    subTitle: "",
+    order: 7,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-8",
+    title: "Chapter 8",
+    subTitle: "",
+    order: 8,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-9",
+    title: "Chapter 9",
+    subTitle: "",
+    order: 9,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-10",
+    title: "Chapter 10",
+    subTitle: "",
+    order: 10,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-11",
+    title: "Chapter 11",
+    subTitle: "",
+    order: 11,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-12",
+    title: "Chapter 12",
+    subTitle: "",
+    order: 12,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-13",
+    title: "Chapter 13",
+    subTitle: "",
+    order: 13,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-14",
+    title: "Chapter 14",
+    subTitle: "",
+    order: 14,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-15",
+    title: "Chapter 15",
+    subTitle: "",
+    order: 15,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-16",
+    title: "Chapter 16",
+    subTitle: "",
+    order: 16,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-17",
+    title: "Chapter 17",
+    subTitle: "",
+    order: 17,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-18",
+    title: "Chapter 18",
+    subTitle: "",
+    order: 18,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-19",
+    title: "Chapter 19",
+    subTitle: "",
+    order: 19,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-20",
+    title: "Chapter 20",
+    subTitle: "",
+    order: 20,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-21",
+    title: "Chapter 21",
+    subTitle: "",
+    order: 21,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-22",
+    title: "Chapter 22",
+    subTitle: "",
+    order: 22,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-23",
+    title: "Chapter 23",
+    subTitle: "",
+    order: 23,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-24",
+    title: "Chapter 24",
+    subTitle: "",
+    order: 24,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-25",
+    title: "Chapter 25",
+    subTitle: "",
+    order: 25,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-26",
+    title: "Chapter 26",
+    subTitle: "",
+    order: 26,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-27",
+    title: "Chapter 27",
+    subTitle: "",
+    order: 27,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-28",
+    title: "Chapter 28",
+    subTitle: "",
+    order: 28,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-29",
+    title: "Chapter 29",
+    subTitle: "",
+    order: 29,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-30",
+    title: "Chapter 30",
+    subTitle: "",
+    order: 30,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-31",
+    title: "Chapter 31",
+    subTitle: "",
+    order: 31,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-32",
+    title: "Chapter 32",
+    subTitle: "",
+    order: 32,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-33",
+    title: "Chapter 33",
+    subTitle: "",
+    order: 33,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-34",
+    title: "Chapter 34",
+    subTitle: "",
+    order: 34,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-35",
+    title: "Chapter 35",
+    subTitle: "",
+    order: 35,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-36",
+    title: "Chapter 36",
+    subTitle: "",
+    order: 36,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-37",
+    title: "Chapter 37",
+    subTitle: "",
+    order: 37,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-38",
+    title: "Chapter 38",
+    subTitle: "",
+    order: 38,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-39",
+    title: "Chapter 39",
+    subTitle: "",
+    order: 39,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-40",
+    title: "Chapter 40",
+    subTitle: "",
+    order: 40,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-41",
+    title: "Chapter 41",
+    subTitle: "",
+    order: 41,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-42",
+    title: "Chapter 42",
+    subTitle: "",
+    order: 42,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-43",
+    title: "Chapter 43",
+    subTitle: "",
+    order: 43,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-44",
+    title: "Chapter 44",
+    subTitle: "",
+    order: 44,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-45",
+    title: "Chapter 45",
+    subTitle: "",
+    order: 45,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-46",
+    title: "Chapter 46",
+    subTitle: "",
+    order: 46,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-47",
+    title: "Chapter 47",
+    subTitle: "",
+    order: 47,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-48",
+    title: "Chapter 48",
+    subTitle: "",
+    order: 48,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-49",
+    title: "Chapter 49",
+    subTitle: "",
+    order: 49,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-50",
+    title: "Chapter 50",
+    subTitle: "",
+    order: 50,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-51",
+    title: "Chapter 51",
+    subTitle: "",
+    order: 51,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-52",
+    title: "Chapter 52",
+    subTitle: "",
+    order: 52,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-53",
+    title: "Chapter 53",
+    subTitle: "",
+    order: 53,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-54",
+    title: "Chapter 54",
+    subTitle: "",
+    order: 54,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-55",
+    title: "Chapter 55",
+    subTitle: "",
+    order: 55,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-56",
+    title: "Chapter 56",
+    subTitle: "",
+    order: 56,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-57",
+    title: "Chapter 57",
+    subTitle: "",
+    order: 57,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-58",
+    title: "Chapter 58",
+    subTitle: "",
+    order: 58,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-59",
+    title: "Chapter 59",
+    subTitle: "",
+    order: 59,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-60",
+    title: "Chapter 60",
+    subTitle: "",
+    order: 60,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-61",
+    title: "Chapter 61",
+    subTitle: "",
+    order: 61,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-62",
+    title: "Chapter 62",
+    subTitle: "",
+    order: 62,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-alma-63",
+    title: "Chapter 63",
+    subTitle: "",
+    order: 63,
+    parent: "nr-alma",
+    visible: true
+  }
+  addChapter(chapter);
+
+
+
   book = {
     id: "nr-helaman",
     title: "The Book of Helaman",
@@ -782,9 +1956,153 @@ router.get('/GET/addBooks', (req, res) => {
     visible: true
   }
   addBook(book);
+  chapter = {
+    id: "nr-helaman-1",
+    title: "Chapter 1",
+    subTitle: "",
+    order: 1,
+    parent: "nr-helaman",
+    visible: true
+  }
+  addChapter(chapter);
+
+  chapter = {
+    id: "nr-helaman-2",
+    title: "Chapter 2",
+    subTitle: "",
+    order: 2,
+    parent: "nr-helaman",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-helaman-3",
+    title: "Chapter 3",
+    subTitle: "",
+    order: 3,
+    parent: "nr-helaman",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-helaman-4",
+    title: "Chapter 4",
+    subTitle: "",
+    order: 4,
+    parent: "nr-helaman",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-helaman-5",
+    title: "Chapter 5",
+    subTitle: "",
+    order: 5,
+    parent: "nr-helaman",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-helaman-6",
+    title: "Chapter 6",
+    subTitle: "",
+    order: 6,
+    parent: "nr-helaman",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-helaman-7",
+    title: "Chapter 7",
+    subTitle: "",
+    order: 7,
+    parent: "nr-helaman",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-helaman-8",
+    title: "Chapter 8",
+    subTitle: "",
+    order: 8,
+    parent: "nr-helaman",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-helaman-9",
+    title: "Chapter 9",
+    subTitle: "",
+    order: 9,
+    parent: "nr-helaman",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-helaman-10",
+    title: "Chapter 10",
+    subTitle: "",
+    order: 10,
+    parent: "nr-helaman",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-helaman-11",
+    title: "Chapter 11",
+    subTitle: "",
+    order: 11,
+    parent: "nr-helaman",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-helaman-12",
+    title: "Chapter 12",
+    subTitle: "",
+    order: 12,
+    parent: "nr-helaman",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-helaman-13",
+    title: "Chapter 13",
+    subTitle: "",
+    order: 13,
+    parent: "nr-helaman",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-helaman-14",
+    title: "Chapter 14",
+    subTitle: "",
+    order: 14,
+    parent: "nr-helaman",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-helaman-15",
+    title: "Chapter 15",
+    subTitle: "",
+    order: 15,
+    parent: "nr-helaman",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-helaman-16",
+    title: "Chapter 16",
+    subTitle: "",
+    order: 16,
+    parent: "nr-helaman",
+    visible: true
+  }
 
   book = {
-    id: "nr-3-Nephi",
+    id: "nr-3-nephi",
     title: "The Third Book of Nephi",
     subTitle: "",
     thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/3-nephi-thumbnail.jpg",
@@ -797,8 +2115,281 @@ router.get('/GET/addBooks', (req, res) => {
   }
   addBook(book);
 
+  chapter = {
+    id: "nr-3-nephi-1",
+    title: "Chapter 1",
+    subTitle: "",
+    order: 1,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+
+  chapter = {
+    id: "nr-3-nephi-2",
+    title: "Chapter 2",
+    subTitle: "",
+    order: 2,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-3",
+    title: "Chapter 3",
+    subTitle: "",
+    order: 3,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-4",
+    title: "Chapter 4",
+    subTitle: "",
+    order: 4,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-5",
+    title: "Chapter 5",
+    subTitle: "",
+    order: 5,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-6",
+    title: "Chapter 6",
+    subTitle: "",
+    order: 6,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-7",
+    title: "Chapter 7",
+    subTitle: "",
+    order: 7,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-8",
+    title: "Chapter 8",
+    subTitle: "",
+    order: 8,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-9",
+    title: "Chapter 9",
+    subTitle: "",
+    order: 9,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-10",
+    title: "Chapter 10",
+    subTitle: "",
+    order: 10,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-11",
+    title: "Chapter 11",
+    subTitle: "",
+    order: 11,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-12",
+    title: "Chapter 12",
+    subTitle: "",
+    order: 12,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-13",
+    title: "Chapter 13",
+    subTitle: "",
+    order: 13,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-14",
+    title: "Chapter 14",
+    subTitle: "",
+    order: 14,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-15",
+    title: "Chapter 15",
+    subTitle: "",
+    order: 15,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-16",
+    title: "Chapter 16",
+    subTitle: "",
+    order: 16,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-17",
+    title: "Chapter 17",
+    subTitle: "",
+    order: 17,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-18",
+    title: "Chapter 18",
+    subTitle: "",
+    order: 18,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-19",
+    title: "Chapter 19",
+    subTitle: "",
+    order: 19,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-20",
+    title: "Chapter 20",
+    subTitle: "",
+    order: 20,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-21",
+    title: "Chapter 21",
+    subTitle: "",
+    order: 21,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-22",
+    title: "Chapter 22",
+    subTitle: "",
+    order: 22,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-23",
+    title: "Chapter 23",
+    subTitle: "",
+    order: 23,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-24",
+    title: "Chapter 24",
+    subTitle: "",
+    order: 24,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-25",
+    title: "Chapter 25",
+    subTitle: "",
+    order: 25,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-26",
+    title: "Chapter 26",
+    subTitle: "",
+    order: 26,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-27",
+    title: "Chapter 27",
+    subTitle: "",
+    order: 27,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-28",
+    title: "Chapter 28",
+    subTitle: "",
+    order: 28,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-29",
+    title: "Chapter 29",
+    subTitle: "",
+    order: 29,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-3-nephi-30",
+    title: "Chapter 30",
+    subTitle: "",
+    order: 30,
+    parent: "nr-3-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+
+
   book = {
-    id: "nr-4-Nephi",
+    id: "nr-4-nephi",
     title: "The Fourth Book of Nephi",
     subTitle: "",
     thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/4-nephi-thumbnail.jpg",
@@ -810,6 +2401,17 @@ router.get('/GET/addBooks', (req, res) => {
     visible: true
   }
   addBook(book);
+
+  chapter = {
+    id: "nr-4-nephi-1",
+    title: "Chapter 1",
+    subTitle: "",
+    order: 1,
+    parent: "nr-4-nephi",
+    visible: true
+  }
+  addChapter(chapter);
+
 
   book = {
     id: "nr-mormon",
@@ -825,6 +2427,90 @@ router.get('/GET/addBooks', (req, res) => {
   }
   addBook(book);
 
+  chapter = {
+    id: "nr-mormon-1",
+    title: "Chapter 1",
+    subTitle: "",
+    order: 1,
+    parent: "nr-mormon",
+    visible: true
+  }
+  addChapter(chapter);
+
+  chapter = {
+    id: "nr-mormon-2",
+    title: "Chapter 2",
+    subTitle: "",
+    order: 2,
+    parent: "nr-mormon",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mormon-3",
+    title: "Chapter 3",
+    subTitle: "",
+    order: 3,
+    parent: "nr-mormon",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mormon-4",
+    title: "Chapter 4",
+    subTitle: "",
+    order: 4,
+    parent: "nr-mormon",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mormon-5",
+    title: "Chapter 5",
+    subTitle: "",
+    order: 5,
+    parent: "nr-mormon",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mormon-6",
+    title: "Chapter 6",
+    subTitle: "",
+    order: 6,
+    parent: "nr-mormon",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mormon-7",
+    title: "Chapter 7",
+    subTitle: "",
+    order: 7,
+    parent: "nr-mormon",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mormon-8",
+    title: "Chapter 8",
+    subTitle: "",
+    order: 8,
+    parent: "nr-mormon",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-mormon-9",
+    title: "Chapter 9",
+    subTitle: "",
+    order: 9,
+    parent: "nr-mormon",
+    visible: true
+  }
+  addChapter(chapter);
+
+
   book = {
     id: "nr-ether",
     title: "The Book of Ether",
@@ -838,6 +2524,144 @@ router.get('/GET/addBooks', (req, res) => {
     visible: true
   }
   addBook(book);
+
+  chapter = {
+    id: "nr-ether-1",
+    title: "Chapter 1",
+    subTitle: "",
+    order: 1,
+    parent: "nr-ether",
+    visible: true
+  }
+  addChapter(chapter);
+
+  chapter = {
+    id: "nr-ether-2",
+    title: "Chapter 2",
+    subTitle: "",
+    order: 2,
+    parent: "nr-ether",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-ether-3",
+    title: "Chapter 3",
+    subTitle: "",
+    order: 3,
+    parent: "nr-ether",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-ether-4",
+    title: "Chapter 4",
+    subTitle: "",
+    order: 4,
+    parent: "nr-ether",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-ether-5",
+    title: "Chapter 5",
+    subTitle: "",
+    order: 5,
+    parent: "nr-ether",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-ether-6",
+    title: "Chapter 6",
+    subTitle: "",
+    order: 6,
+    parent: "nr-ether",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-ether-7",
+    title: "Chapter 7",
+    subTitle: "",
+    order: 7,
+    parent: "nr-ether",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-ether-8",
+    title: "Chapter 8",
+    subTitle: "",
+    order: 8,
+    parent: "nr-ether",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-ether-9",
+    title: "Chapter 9",
+    subTitle: "",
+    order: 9,
+    parent: "nr-ether",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-ether-10",
+    title: "Chapter 10",
+    subTitle: "",
+    order: 10,
+    parent: "nr-ether",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-ether-11",
+    title: "Chapter 11",
+    subTitle: "",
+    order: 11,
+    parent: "nr-ether",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-ether-12",
+    title: "Chapter 12",
+    subTitle: "",
+    order: 12,
+    parent: "nr-ether",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-ether-13",
+    title: "Chapter 13",
+    subTitle: "",
+    order: 13,
+    parent: "nr-ether",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-ether-14",
+    title: "Chapter 14",
+    subTitle: "",
+    order: 14,
+    parent: "nr-ether",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-ether-15",
+    title: "Chapter 15",
+    subTitle: "",
+    order: 15,
+    parent: "nr-ether",
+    visible: true
+  }
+  addChapter(chapter);
+
 
   book = {
     id: "nr-moroni",
@@ -854,6 +2678,99 @@ router.get('/GET/addBooks', (req, res) => {
   addBook(book);
 
 
+    chapter = {
+    id: "nr-moroni-1",
+    title: "Chapter 1",
+    subTitle: "",
+    order: 1,
+    parent: "nr-moroni",
+    visible: true
+  }
+  addChapter(chapter);
+
+  chapter = {
+    id: "nr-moroni-2",
+    title: "Chapter 2",
+    subTitle: "",
+    order: 2,
+    parent: "nr-moroni",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-moroni-3",
+    title: "Chapter 3",
+    subTitle: "",
+    order: 3,
+    parent: "nr-moroni",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-moroni-4",
+    title: "Chapter 4",
+    subTitle: "",
+    order: 4,
+    parent: "nr-moroni",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-moroni-5",
+    title: "Chapter 5",
+    subTitle: "",
+    order: 5,
+    parent: "nr-moroni",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-moroni-6",
+    title: "Chapter 6",
+    subTitle: "",
+    order: 6,
+    parent: "nr-moroni",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-moroni-7",
+    title: "Chapter 7",
+    subTitle: "",
+    order: 7,
+    parent: "nr-moroni",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-moroni-8",
+    title: "Chapter 8",
+    subTitle: "",
+    order: 8,
+    parent: "nr-moroni",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-moroni-9",
+    title: "Chapter 9",
+    subTitle: "",
+    order: 9,
+    parent: "nr-moroni",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nr-moroni-10",
+    title: "Chapter 10",
+    subTitle: "",
+    order: 10,
+    parent: "nr-moroni",
+    visible: true
+  }
+  addChapter(chapter);
+
+
   book = {
     id: "the-oral-torah",
     title: "The Oral Torah",
@@ -864,7 +2781,7 @@ router.get('/GET/addBooks', (req, res) => {
     hasChildBooks: true,
     order: 2,
     parent: "",
-    visible: true
+    visible: false
   }
   addBook(book);
 
@@ -896,6 +2813,264 @@ router.get('/GET/addBooks', (req, res) => {
     visible: true
   }
   addBook(book);
+  chapter = {
+    id: "nt-matthew-1",
+    title: "Chapter 1",
+    subTitle: "",
+    order: 1,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+
+  chapter = {
+    id: "nt-matthew-2",
+    title: "Chapter 2",
+    subTitle: "",
+    order: 2,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-3",
+    title: "Chapter 3",
+    subTitle: "",
+    order: 3,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-4",
+    title: "Chapter 4",
+    subTitle: "",
+    order: 4,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-5",
+    title: "Chapter 5",
+    subTitle: "",
+    order: 5,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-6",
+    title: "Chapter 6",
+    subTitle: "",
+    order: 6,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-7",
+    title: "Chapter 7",
+    subTitle: "",
+    order: 7,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-8",
+    title: "Chapter 8",
+    subTitle: "",
+    order: 8,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-9",
+    title: "Chapter 9",
+    subTitle: "",
+    order: 9,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-10",
+    title: "Chapter 10",
+    subTitle: "",
+    order: 10,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-11",
+    title: "Chapter 11",
+    subTitle: "",
+    order: 11,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-12",
+    title: "Chapter 12",
+    subTitle: "",
+    order: 12,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-13",
+    title: "Chapter 13",
+    subTitle: "",
+    order: 13,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-14",
+    title: "Chapter 14",
+    subTitle: "",
+    order: 14,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-15",
+    title: "Chapter 15",
+    subTitle: "",
+    order: 15,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-16",
+    title: "Chapter 16",
+    subTitle: "",
+    order: 16,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-17",
+    title: "Chapter 17",
+    subTitle: "",
+    order: 17,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-18",
+    title: "Chapter 18",
+    subTitle: "",
+    order: 18,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-19",
+    title: "Chapter 19",
+    subTitle: "",
+    order: 19,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-20",
+    title: "Chapter 20",
+    subTitle: "",
+    order: 20,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-21",
+    title: "Chapter 21",
+    subTitle: "",
+    order: 21,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-22",
+    title: "Chapter 22",
+    subTitle: "",
+    order: 22,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-23",
+    title: "Chapter 23",
+    subTitle: "",
+    order: 23,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-24",
+    title: "Chapter 24",
+    subTitle: "",
+    order: 24,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-25",
+    title: "Chapter 25",
+    subTitle: "",
+    order: 25,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-26",
+    title: "Chapter 26",
+    subTitle: "",
+    order: 26,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-27",
+    title: "Chapter 27",
+    subTitle: "",
+    order: 27,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-matthew-28",
+    title: "Chapter 28",
+    subTitle: "",
+    order: 28,
+    parent: "nt-matthew",
+    visible: true
+  }
+  addChapter(chapter);
+
+
+
+
+
 
   book = {
     id: "nt-mark",
@@ -911,6 +3086,153 @@ router.get('/GET/addBooks', (req, res) => {
   }
   addBook(book);
 
+  chapter = {
+    id: "nt-mark-1",
+    title: "Chapter 1",
+    subTitle: "",
+    order: 1,
+    parent: "nt-mark",
+    visible: true
+  }
+  addChapter(chapter);
+
+  chapter = {
+    id: "nt-mark-2",
+    title: "Chapter 2",
+    subTitle: "",
+    order: 2,
+    parent: "nt-mark",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-mark-3",
+    title: "Chapter 3",
+    subTitle: "",
+    order: 3,
+    parent: "nt-mark",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-mark-4",
+    title: "Chapter 4",
+    subTitle: "",
+    order: 4,
+    parent: "nt-mark",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-mark-5",
+    title: "Chapter 5",
+    subTitle: "",
+    order: 5,
+    parent: "nt-mark",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-mark-6",
+    title: "Chapter 6",
+    subTitle: "",
+    order: 6,
+    parent: "nt-mark",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-mark-7",
+    title: "Chapter 7",
+    subTitle: "",
+    order: 7,
+    parent: "nt-mark",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-mark-8",
+    title: "Chapter 8",
+    subTitle: "",
+    order: 8,
+    parent: "nt-mark",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-mark-9",
+    title: "Chapter 9",
+    subTitle: "",
+    order: 9,
+    parent: "nt-mark",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-mark-10",
+    title: "Chapter 10",
+    subTitle: "",
+    order: 10,
+    parent: "nt-mark",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-mark-11",
+    title: "Chapter 11",
+    subTitle: "",
+    order: 11,
+    parent: "nt-mark",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-mark-12",
+    title: "Chapter 12",
+    subTitle: "",
+    order: 12,
+    parent: "nt-mark",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-mark-13",
+    title: "Chapter 13",
+    subTitle: "",
+    order: 13,
+    parent: "nt-mark",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-mark-14",
+    title: "Chapter 14",
+    subTitle: "",
+    order: 14,
+    parent: "nt-mark",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-mark-15",
+    title: "Chapter 15",
+    subTitle: "",
+    order: 15,
+    parent: "nt-mark",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-mark-16",
+    title: "Chapter 16",
+    subTitle: "",
+    order: 16,
+    parent: "nt-mark",
+    visible: true
+  }
+  addChapter(chapter);
+
+
   book = {
     id: "nt-luke",
     title: "The Gospel According to St Luke",
@@ -924,6 +3246,226 @@ router.get('/GET/addBooks', (req, res) => {
     visible: true
   }
   addBook(book);
+
+  chapter = {
+    id: "nt-luke-1",
+    title: "Chapter 1",
+    subTitle: "",
+    order: 1,
+    parent: "nt-luke",
+    visible: true
+  }
+  addChapter(chapter);
+
+  chapter = {
+    id: "nt-luke-2",
+    title: "Chapter 2",
+    subTitle: "",
+    order: 2,
+    parent: "nt-luke",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-luke-3",
+    title: "Chapter 3",
+    subTitle: "",
+    order: 3,
+    parent: "nt-luke",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-luke-4",
+    title: "Chapter 4",
+    subTitle: "",
+    order: 4,
+    parent: "nt-luke",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-luke-5",
+    title: "Chapter 5",
+    subTitle: "",
+    order: 5,
+    parent: "nt-luke",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-luke-6",
+    title: "Chapter 6",
+    subTitle: "",
+    order: 6,
+    parent: "nt-luke",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-luke-7",
+    title: "Chapter 7",
+    subTitle: "",
+    order: 7,
+    parent: "nt-luke",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-luke-8",
+    title: "Chapter 8",
+    subTitle: "",
+    order: 8,
+    parent: "nt-luke",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-luke-9",
+    title: "Chapter 9",
+    subTitle: "",
+    order: 9,
+    parent: "nt-luke",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-luke-10",
+    title: "Chapter 10",
+    subTitle: "",
+    order: 10,
+    parent: "nt-luke",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-luke-11",
+    title: "Chapter 11",
+    subTitle: "",
+    order: 11,
+    parent: "nt-luke",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-luke-12",
+    title: "Chapter 12",
+    subTitle: "",
+    order: 12,
+    parent: "nt-luke",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-luke-13",
+    title: "Chapter 13",
+    subTitle: "",
+    order: 13,
+    parent: "nt-luke",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-luke-14",
+    title: "Chapter 14",
+    subTitle: "",
+    order: 14,
+    parent: "nt-luke",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-luke-15",
+    title: "Chapter 15",
+    subTitle: "",
+    order: 15,
+    parent: "nt-luke",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-luke-16",
+    title: "Chapter 16",
+    subTitle: "",
+    order: 16,
+    parent: "nt-luke",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-luke-17",
+    title: "Chapter 17",
+    subTitle: "",
+    order: 17,
+    parent: "nt-luke",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-luke-18",
+    title: "Chapter 18",
+    subTitle: "",
+    order: 18,
+    parent: "nt-luke",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-luke-19",
+    title: "Chapter 19",
+    subTitle: "",
+    order: 19,
+    parent: "nt-luke",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-luke-20",
+    title: "Chapter 20",
+    subTitle: "",
+    order: 20,
+    parent: "nt-luke",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-luke-21",
+    title: "Chapter 21",
+    subTitle: "",
+    order: 21,
+    parent: "nt-luke",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-luke-22",
+    title: "Chapter 22",
+    subTitle: "",
+    order: 22,
+    parent: "nt-luke",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-luke-23",
+    title: "Chapter 23",
+    subTitle: "",
+    order: 23,
+    parent: "nt-luke",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-luke-24",
+    title: "Chapter 24",
+    subTitle: "",
+    order: 24,
+    parent: "nt-luke",
+    visible: true
+  }
+  addChapter(chapter);
+
+
   book = {
     id: "nt-john",
     title: "The Gospel According to St John",
@@ -937,6 +3479,201 @@ router.get('/GET/addBooks', (req, res) => {
     visible: true
   }
   addBook(book);
+
+  chapter = {
+    id: "nt-john-1",
+    title: "Chapter 1",
+    subTitle: "",
+    order: 1,
+    parent: "nt-john",
+    visible: true
+  }
+  addChapter(chapter);
+
+  chapter = {
+    id: "nt-john-2",
+    title: "Chapter 2",
+    subTitle: "",
+    order: 2,
+    parent: "nt-john",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-john-3",
+    title: "Chapter 3",
+    subTitle: "",
+    order: 3,
+    parent: "nt-john",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-john-4",
+    title: "Chapter 4",
+    subTitle: "",
+    order: 4,
+    parent: "nt-john",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-john-5",
+    title: "Chapter 5",
+    subTitle: "",
+    order: 5,
+    parent: "nt-john",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-john-6",
+    title: "Chapter 6",
+    subTitle: "",
+    order: 6,
+    parent: "nt-john",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-john-7",
+    title: "Chapter 7",
+    subTitle: "",
+    order: 7,
+    parent: "nt-john",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-john-8",
+    title: "Chapter 8",
+    subTitle: "",
+    order: 8,
+    parent: "nt-john",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-john-9",
+    title: "Chapter 9",
+    subTitle: "",
+    order: 9,
+    parent: "nt-john",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-john-10",
+    title: "Chapter 10",
+    subTitle: "",
+    order: 10,
+    parent: "nt-john",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-john-11",
+    title: "Chapter 11",
+    subTitle: "",
+    order: 11,
+    parent: "nt-john",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-john-12",
+    title: "Chapter 12",
+    subTitle: "",
+    order: 12,
+    parent: "nt-john",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-john-13",
+    title: "Chapter 13",
+    subTitle: "",
+    order: 13,
+    parent: "nt-john",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-john-14",
+    title: "Chapter 14",
+    subTitle: "",
+    order: 14,
+    parent: "nt-john",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-john-15",
+    title: "Chapter 15",
+    subTitle: "",
+    order: 15,
+    parent: "nt-john",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-john-16",
+    title: "Chapter 16",
+    subTitle: "",
+    order: 16,
+    parent: "nt-john",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-john-17",
+    title: "Chapter 17",
+    subTitle: "",
+    order: 17,
+    parent: "nt-john",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-john-18",
+    title: "Chapter 18",
+    subTitle: "",
+    order: 18,
+    parent: "nt-john",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-john-19",
+    title: "Chapter 19",
+    subTitle: "",
+    order: 19,
+    parent: "nt-john",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-john-20",
+    title: "Chapter 20",
+    subTitle: "",
+    order: 20,
+    parent: "nt-john",
+    visible: true
+  }
+  addChapter(chapter);
+  chapter = {
+    id: "nt-john-21",
+    title: "Chapter 21",
+    subTitle: "",
+    order: 21,
+    parent: "nt-john",
+    visible: true
+  }
+  addChapter(chapter);
+
+
+
+
   book = {
     id: "nt-acts",
     title: "The Acts of the Apostles",
@@ -1250,7 +3987,7 @@ router.get('/GET/addBooks', (req, res) => {
     hasChildBooks: false,
     order: 4,
     parent: "",
-    visible: true
+    visible: false
   }
   addBook(book);
 
@@ -1258,12 +3995,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "dc-introduction",
     title: "Introduction",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Introduction",
     order: 1,
     parent: "the-doctrine-and-covenants",
-    previousChapter: "",
-    nextChapter: "dc-lectures-1",
     visible: true
   }
   addChapter(chapter);
@@ -1271,12 +4004,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "dc-lectures-1",
     title: "Lectures on Faith",
     subTitle: "Chapter 1",
-    thumbnail: "",
-    thumbnailTitle: "Lecture 1",
     order: 2,
     parent: "the-doctrine-and-covenants",
-    previousChapter: "dc-introduction",
-    nextChapter: "dc-lectures-2",
     visible: true
   }
   addChapter(chapter);
@@ -1284,12 +4013,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "dc-lectures-2",
     title: "Lectures on Faith",
     subTitle: "Chapter 2",
-    thumbnail: "",
-    thumbnailTitle: "Lecture 2",
     order: 3,
     parent: "the-doctrine-and-covenants",
-    previousChapter: "dc-lectures-1",
-    nextChapter: "dc-lectures-2",
     visible: true
   }
   addChapter(chapter);
@@ -1297,12 +4022,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "dc-lectures-3",
     title: "Lectures on Faith",
     subTitle: "Chapter 3",
-    thumbnail: "",
-    thumbnailTitle: "Lecture 3",
     order: 4,
     parent: "the-doctrine-and-covenants",
-    previousChapter: "dc-lectures-2",
-    nextChapter: "dc-lectures-4",
     visible: true
   }
   addChapter(chapter);
@@ -1310,12 +4031,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "dc-lectures-4",
     title: "Lectures on Faith",
     subTitle: "Chapter 4",
-    thumbnail: "",
-    thumbnailTitle: "Lecture 4",
     order: 5,
     parent: "the-doctrine-and-covenants",
-    previousChapter: "dc-lectures-3",
-    nextChapter: "dc-lectures-5",
     visible: true
   }
   addChapter(chapter);
@@ -1323,12 +4040,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "dc-lectures-5",
     title: "Lectures on Faith",
     subTitle: "Chapter 5",
-    thumbnail: "",
-    thumbnailTitle: "Lecture 5",
     order: 6,
     parent: "the-doctrine-and-covenants",
-    previousChapter: "dc-lectures-4",
-    nextChapter: "dc-section-1",
     visible: true
   }
   addChapter(chapter);
@@ -1336,12 +4049,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "dc-section-1",
     title: "Section 1",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Section 1",
     order: 7,
     parent: "the-doctrine-and-covenants",
-    previousChapter: "dc-lectures-5",
-    nextChapter: "dc-section-2",
     visible: true
   }
   addChapter(chapter);
@@ -1349,12 +4058,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "dc-section-2",
     title: "Section 2",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Section 2",
     order: 8,
     parent: "the-doctrine-and-covenants",
-    previousChapter: "dc-section-1",
-    nextChapter: "dc-section-3",
     visible: true
   }
   addChapter(chapter);
@@ -1362,12 +4067,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "dc-section-3",
     title: "Section 3",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Section 3",
     order: 9,
     parent: "the-doctrine-and-covenants",
-    previousChapter: "dc-section-2",
-    nextChapter: "dc-section-4",
     visible: true
   }
   addChapter(chapter);
@@ -1375,12 +4076,8 @@ router.get('/GET/addBooks', (req, res) => {
     id: "dc-section-4",
     title: "Section 4",
     subTitle: "",
-    thumbnail: "",
-    thumbnailTitle: "Section 4",
     order: 10,
     parent: "the-doctrine-and-covenants",
-    previousChapter: "dc-section-3",
-    nextChapter: "dc-section-5",
     visible: true
   }
   addChapter(chapter);
