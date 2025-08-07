@@ -3,11 +3,12 @@ const app = express();
 const path = require('path');
 const port = 3000;
 const router = express.Router();
-const cors = require('cors');
+
 
 app.use(express.json());       // to support JSON-encoded bodies
 app.use(express.urlencoded()); // to support URL-encoded bodies
-
+/*
+const cors = require('cors');
 // CORS configuration
 const allowedOrigins = [
         'http://localhost:8080',
@@ -19,7 +20,7 @@ const corsOptions = {
   origin: allowedOrigins
 }
 app.use(cors(corsOptions));
-
+*/
 
 
 // Serve static files from the 'public' directory
@@ -34,13 +35,10 @@ app.get('/', (req, res) => {
 });
 
 const database = require("./database/database");
-
-
 const rest = require("./routes/rest.js");
 app.use("/rest", rest);
-module.exports = router;
+
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
-
