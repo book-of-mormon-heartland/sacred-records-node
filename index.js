@@ -38,6 +38,9 @@ const database = require("./database/database");
 const rest = require("./routes/rest.js");
 app.use("/rest", rest);
 
+const nicodemus = require("./routes/nicodemus.js");
+app.use("/nicodemus", nicodemus);
+
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)

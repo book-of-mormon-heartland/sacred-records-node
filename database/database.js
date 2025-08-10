@@ -21,10 +21,11 @@ db.settings({
 */
 
 // code for dev with propers settings in the development environment including see readme.md
-
 require('dotenv').config();
 const admin = require('firebase-admin');
-var serviceAccountPath = settings.GOOGLE_APPLICATION_CREDENTIALS;
+const  GOOGLE_CREDENTIALS_PATH = process.env.GOOGLE_CREDENTIALS_PATH;
+
+var serviceAccountPath = GOOGLE_CREDENTIALS_PATH;
 if (serviceAccountPath) {
   const serviceAccount = require(serviceAccountPath);
   admin.initializeApp({
@@ -38,43 +39,127 @@ db.settings({
   databaseId: 'sacredrecords', // Uncomment and replace with your actual database ID if
 });
 
-function addUser( user ) {
+const addUser = async ( user ) => {
   const docRef = db.collection('users').doc(user.id);
-  docRef.set({
-        photo: user.photo,
-        givenName: user.givenName,
-        familyName: user.familyName,
-        email: user.email,
-        name: user.name,
-        id: user.id,
-  });
-      //console.log('Google User Added Successfully!');
-}
-
-function addBook( book ) {
-  const docRef = db.collection('books').doc(book.id);
-  docRef.set(book);     //console.log('Google User Added Successfully!');
-}
-
-function addChapter( chapter ) {
-  const docRef = db.collection('chapters').doc(chapter.id);
-  docRef.set(chapter);     //console.log('Google User Added Successfully!');
-}
-
-
-function addToken( userid, token ) {
-  const docRef = db.collection('tokens').doc(userid);
-  docRef.set({
-    token: token,
-    userId: userid,
-  });
-}
-
-function removeToken( userid ) {
   try {
-    const res = db.collection('tokens').doc(userid).delete();
+    await  docRef.set(user);
+    console.log('Document successfully deleted!');
   } catch (error) {
-    console.error("Error removing document: ", error);
+    console.error('Error deleting document:', error);
+  }
+}
+
+const removeUser = async ( user ) => {
+  const docRef = db.collection('users').doc(user.id);
+  try {
+    await  docRef.delete();
+    console.log('Document successfully deleted!');
+  } catch (error) {
+    console.error('Error deleting document:', error);
+  }
+}
+
+const addBook = async( book ) => {
+  const docRef = db.collection('books').doc(book.id);
+  try {
+    await  docRef.set(book);
+    console.log('Document successfully deleted!');
+  } catch (error) {
+    console.error('Error deleting document:', error);
+  }
+}
+
+const removeBook = async(book) => {
+  const docRef = db.collection('books').doc(book.id);
+  try {
+    await docRef.delete();
+    console.log('Document successfully deleted!');
+  } catch (error) {
+    console.error('Error deleting document:', error);
+  }
+}
+
+const addChapter = async( chapter ) => {
+  const docRef = db.collection('chapters').doc(chapter.id);
+  try {
+    await docRef.set(chapter);
+    console.log('Document successfully deleted!');
+  } catch (error) {
+    console.error('Error deleting document:', error);
+  }
+}
+
+const removeChapter = async(chapter) => {
+  const docRef = db.collection('chapters').doc(chapter.id);
+  try {
+    await docRef.delete();
+    console.log('Document successfully deleted!');
+  } catch (error) {
+    console.error('Error deleting document:', error);
+  }
+}
+
+const addChapterText = async( chapter ) => {
+  const docRef = db.collection('chaptertext').doc(chapter.id);
+  try {
+    await docRef.set(chapter);;
+    console.log('Document successfully deleted!');
+  } catch (error) {
+    console.error('Error deleting document:', error);
+  }
+}
+
+const removeChapterText = async (chapter) => {
+  const docRef = db.collection('chaptertext').doc(chapter.id);
+  try {
+    await docRef.delete();
+    console.log('Document successfully deleted!');
+  } catch (error) {
+    console.error('Error deleting document:', error);
+  }
+}
+
+const addChapterAudio = async( chapter ) => {
+  const docRef = db.collection('chapteraudio').doc(chapter.id);
+  try {
+    await docRef.set(chapter);
+    console.log('Document successfully deleted!');
+  } catch (error) {
+    console.error('Error deleting document:', error);
+  }
+}
+
+const removeChapterAudio = async(chapter) => {
+  const docRef = db.collection('chapteraudio').doc(chapter.id);
+  try {
+    await docRef.delete();
+    console.log('Document successfully deleted!');
+  } catch (error) {
+    console.error('Error deleting document:', error);
+  }
+}
+
+
+const addToken = async( userid, token ) => {
+  const docRef = db.collection('tokens').doc(userid);
+  try {
+    await docRef.set({
+      token: token,
+      userId: userid,
+    });
+    console.log('Document successfully deleted!');
+  } catch (error) {
+    console.error('Error deleting document:', error);
+  }
+}
+
+const removeToken = async( userid ) => {
+  const res = db.collection('tokens').doc(userid);
+  try {
+    await docRef.delete();
+    console.log('Document successfully deleted!');
+  } catch (error) {
+    console.error('Error deleting document:', error);
   }
 }
 
@@ -83,8 +168,15 @@ function removeToken( userid ) {
 module.exports = {
   db,
   addUser,
+  removeUser,
   addBook,
+  removeBook,
   addChapter,
+  removeChapter,
+  addChapterText,
+  removeChapterText,
+  addChapterAudio,
+  removeChapterAudio,
   addToken,
   removeToken
 };

@@ -45,7 +45,7 @@ router.post('/POST/googlelogin', (req, res) => {
         }));
     }
     // Add or update the user.  Same thing here.
-    addUser(user);
+    await addUser(user);
     // generate the jwt token.
     let jwtToken = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: '1h' });
     let refreshToken = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: '7d' });
@@ -134,31 +134,27 @@ router.get('/GET/book', (req, res) => {
       console.error('Error getting documents', err);
       return res.status(500).send('Error retrieving book');
     });
-    
 });
 
 router.get('/GET/books', (req, res) => {
-
   console.log("GET /GET/books called");
-  
-   db.collection('books').where("isParent", "==", true).where("visible", "==", true).orderBy("order", "asc").get()
+  db.collection('books').where("isParent", "==", true).where("visible", "==", true).orderBy("order", "asc").get()
     .then(snapshot => {
+      let books = [];
       if (snapshot.empty) {
-        console.log('No matching documents.');
-        return res.status(404).send('No Matching found');
+        return res.json(books);
       }
-
-      let users = [];
       snapshot.forEach(doc => {
-        users.push({ id: doc.id, ...doc.data() });
+        books.push({ id: doc.id, ...doc.data() });
       });
-      return res.json(users);
+      return res.json(books);
     })
     .catch(err => {
       console.error('Error getting documents', err);
       return res.status(500).send('Error retrieving users');
     });
-});
+  }
+);
 
 
 router.get('/GET/chapters', (req, res) => {
@@ -186,28 +182,23 @@ router.get('/GET/chapters', (req, res) => {
     });
 });
 
-
-
-
-// GET all users
-router.get('/GET/users', (req, res) => {
-
-  // need protection for only authenticated and authorized users.
-  db.collection('users').get()
+router.get('/GET/chapterContentText', (req, res) => {
+  console.log('/GET/chapterContentText');
+  let chapterId = req.query.id;
+  db.collection('chaptertext').where("id", "==", chapterId).orderBy("order", "asc").get()
     .then(snapshot => {
       if (snapshot.empty) {
-        //console.log('No matching documents.');
-        return res.status(404).send('No users found');
+        return res.status(404).send('No Matching found');
       }
 
-      let users = [];
+      let chapters = [];
       snapshot.forEach(doc => {
-        users.push({ id: doc.id, ...doc.data() });
+        chapters.push({ id: doc.id, ...doc.data() });
       });
-      return res.json(users);
+      return res.json(chapters);
     })
     .catch(err => {
-      //console.error('Error getting documents', err);
+      console.error('Error getting documents', err);
       return res.status(500).send('Error retrieving users');
     });
 });
