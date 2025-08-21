@@ -83,7 +83,7 @@ const addChapter = async( chapter ) => {
   const docRef = db.collection('chapters').doc(chapter.id);
   try {
     await docRef.set(chapter);
-    console.log('Document successfully deleted!');
+    console.log('Document successfully added!');
   } catch (error) {
     console.error('Error deleting document:', error);
   }
@@ -103,7 +103,7 @@ const addChapterText = async( chapter ) => {
   const docRef = db.collection('chaptertext').doc(chapter.id);
   try {
     await docRef.set(chapter);;
-    console.log('Document successfully deleted!');
+    console.log('Document successfully added!');
   } catch (error) {
     console.error('Error deleting document:', error);
   }
@@ -123,7 +123,7 @@ const addChapterAudio = async( chapter ) => {
   const docRef = db.collection('chapteraudio').doc(chapter.id);
   try {
     await docRef.set(chapter);
-    console.log('Document successfully deleted!');
+    console.log('Document successfully added!');
   } catch (error) {
     console.error('Error deleting document:', error);
   }

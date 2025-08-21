@@ -38,8 +38,14 @@ const database = require("./database/database");
 const rest = require("./routes/rest.js");
 app.use("/rest", rest);
 
-const nicodemus = require("./routes/nicodemus.js");
-app.use("/nicodemus", nicodemus);
+//const nicodemus = require("./routes/nicodemus.js");
+//app.use("/nicodemus", nicodemus);
+//const miskwaabik = require("./routes/miskwaabik.js");
+//app.use("/miskwaabik", miskwaabik);
+//const nephiteRecord = require("./routes/nephiterecord.js");
+//app.use("/nephiterecord", nephiteRecord);
+//const newtestament = require("./routes/newtestament.js");
+//app.use("/newtestament", newtestament);
 
 
 app.listen(port, () => {
