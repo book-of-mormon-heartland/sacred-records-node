@@ -42,8 +42,8 @@ app.use("/rest", rest);
 //app.use("/nicodemus", nicodemus);
 //const miskwaabik = require("./routes/miskwaabik.js");
 //app.use("/miskwaabik", miskwaabik);
-//const nephiteRecord = require("./routes/nephiterecord.js");
-//app.use("/nephiterecord", nephiteRecord);
+const nephiteRecord = require("./routes/nephiterecord.js");
+app.use("/nephiterecord", nephiteRecord);
 //const newtestament = require("./routes/newtestament.js");
 //app.use("/newtestament", newtestament);
 

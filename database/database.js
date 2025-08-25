@@ -43,9 +43,9 @@ const addUser = async ( user ) => {
   const docRef = db.collection('users').doc(user.id);
   try {
     await  docRef.set(user);
-    console.log('Document successfully deleted!');
+    console.log('User successfully added!');
   } catch (error) {
-    console.error('Error deleting document:', error);
+    console.error('Error adding user:', error);
   }
 }
 
@@ -53,9 +53,9 @@ const removeUser = async ( user ) => {
   const docRef = db.collection('users').doc(user.id);
   try {
     await  docRef.delete();
-    console.log('Document successfully deleted!');
+    console.log('User successfully deleted!');
   } catch (error) {
-    console.error('Error deleting document:', error);
+    console.error('Error deleting user:', error);
   }
 }
 
@@ -63,9 +63,9 @@ const addBook = async( book ) => {
   const docRef = db.collection('books').doc(book.id);
   try {
     await  docRef.set(book);
-    console.log('Document successfully deleted!');
+    console.log('Book successfully added!');
   } catch (error) {
-    console.error('Error deleting document:', error);
+    console.error('Error adding book:', error);
   }
 }
 
@@ -73,9 +73,9 @@ const removeBook = async(book) => {
   const docRef = db.collection('books').doc(book.id);
   try {
     await docRef.delete();
-    console.log('Document successfully deleted!');
+    console.log('Book successfully deleted!');
   } catch (error) {
-    console.error('Error deleting document:', error);
+    console.error('Error deleting book:', error);
   }
 }
 
@@ -83,9 +83,9 @@ const addChapter = async( chapter ) => {
   const docRef = db.collection('chapters').doc(chapter.id);
   try {
     await docRef.set(chapter);
-    console.log('Document successfully added!');
+    console.log('Chapter successfully added!');
   } catch (error) {
-    console.error('Error deleting document:', error);
+    console.error('Error adding chapter:', error);
   }
 }
 
@@ -93,9 +93,9 @@ const removeChapter = async(chapter) => {
   const docRef = db.collection('chapters').doc(chapter.id);
   try {
     await docRef.delete();
-    console.log('Document successfully deleted!');
+    console.log('Chapter successfully deleted!');
   } catch (error) {
-    console.error('Error deleting document:', error);
+    console.error('Error deleting chapter:', error);
   }
 }
 
@@ -103,9 +103,9 @@ const addChapterText = async( chapter ) => {
   const docRef = db.collection('chaptertext').doc(chapter.id);
   try {
     await docRef.set(chapter);;
-    console.log('Document successfully added!');
+    console.log('Chapter Text successfully added!');
   } catch (error) {
-    console.error('Error deleting document:', error);
+    console.error('Error adding chapter text:', error);
   }
 }
 
@@ -113,9 +113,9 @@ const removeChapterText = async (chapter) => {
   const docRef = db.collection('chaptertext').doc(chapter.id);
   try {
     await docRef.delete();
-    console.log('Document successfully deleted!');
+    console.log('Chapter text successfully deleted!');
   } catch (error) {
-    console.error('Error deleting document:', error);
+    console.error('Chapter text deletion error:', error);
   }
 }
 
@@ -123,9 +123,9 @@ const addChapterAudio = async( chapter ) => {
   const docRef = db.collection('chapteraudio').doc(chapter.id);
   try {
     await docRef.set(chapter);
-    console.log('Document successfully added!');
+    console.log('Audio Chapter successfully added!');
   } catch (error) {
-    console.error('Error deleting document:', error);
+    console.error('Error adding Audio Chapter:', error);
   }
 }
 
@@ -133,9 +133,9 @@ const removeChapterAudio = async(chapter) => {
   const docRef = db.collection('chapteraudio').doc(chapter.id);
   try {
     await docRef.delete();
-    console.log('Document successfully deleted!');
+    console.log('Audio Chapter successfully deleted!');
   } catch (error) {
-    console.error('Error deleting document:', error);
+    console.error('Error deleting audio Chapter:', error);
   }
 }
 
@@ -147,9 +147,9 @@ const addToken = async( userid, token ) => {
       token: token,
       userId: userid,
     });
-    console.log('Document successfully deleted!');
+    console.log('token successfully added!');
   } catch (error) {
-    console.error('Error deleting document:', error);
+    console.error('Error adding token:', error);
   }
 }
 
@@ -157,9 +157,9 @@ const removeToken = async( userid ) => {
   const res = db.collection('tokens').doc(userid);
   try {
     await docRef.delete();
-    console.log('Document successfully deleted!');
+    console.log('Token successfully deleted!');
   } catch (error) {
-    console.error('Error deleting document:', error);
+    console.error('Error removing token:', error);
   }
 }
 
