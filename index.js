@@ -1,8 +1,10 @@
-const express = require('express');
+import express from 'express';
 const app = express();
-const path = require('path');
 const port = 3000;
-const router = express.Router();
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import { router } from './routes/rest.js';
 
 
 app.use(express.json());       // to support JSON-encoded bodies
@@ -24,6 +26,8 @@ app.use(cors(corsOptions));
 
 
 // Serve static files from the 'public' directory
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // for rest api to use json.
@@ -34,16 +38,15 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-const database = require("./database/database");
-const rest = require("./routes/rest.js");
-app.use("/rest", rest);
+
+app.use("/rest", router);
 
 //const nicodemus = require("./routes/nicodemus.js");
 //app.use("/nicodemus", nicodemus);
 //const miskwaabik = require("./routes/miskwaabik.js");
 //app.use("/miskwaabik", miskwaabik);
-const nephiteRecord = require("./routes/nephiterecord.js");
-app.use("/nephiterecord", nephiteRecord);
+//const nephiteRecord = require("./routes/nephiterecord.js");
+//app.use("/nephiterecord", nephiteRecord);
 //const newtestament = require("./routes/newtestament.js");
 //app.use("/newtestament", newtestament);
 

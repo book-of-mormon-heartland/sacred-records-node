@@ -1,18 +1,18 @@
 
-const express = require("express");
-const { text } = require('body-parser');
-const router = express.Router();
-const { OAuth2Client } = require('google-auth-library');
-const { db, addUser, addBook, addToken, removeToken, getBook, addChapter } = require("../database/database.js"); // Import the database module
-require('dotenv').config(); // Load environment variables
+import express from 'express';
+//import { text } from 'body-parser';
+import { OAuth2Client } from 'google-auth-library';
+import 'dotenv/config'; 
+import jwt from 'jsonwebtoken';
+import { db, addOrUpdateUser, getUserLanguage, saveLanguageToUserProfile } from "../database/database.js"; // Import the database module
 
 
 const GOOGLE_WEB_CLIENT_ID = '376185747738-hced54r8i2jc4bjq428i54dp2g4uhnvo.apps.googleusercontent.com'; 
 const GOOGLE_ANDROID_CLIENT_ID = '376185747738-ha1jqq32roeta8g7c34c7koend7lmp5o.apps.googleusercontent.com'; 
 const GOOGLE_IOS_CLIENT_ID = '376185747738-t1nrjh269jqarco0grlo6a5vs8fcbf8b.apps.googleusercontent.com';
-const jwt = require('jsonwebtoken');
 const jwtSecret = process.env.JWT_SECRET;
 
+export const router = express.Router();
 
 // Home page route.
 router.get("/", function (req, res) {
@@ -45,19 +45,22 @@ router.post('/POST/googlelogin', (req, res) => {
         }));
     }
     // Add or update the user.  Same thing here.
-    await addUser(user);
+    addOrUpdateUser(user);
+    let language = await getUserLanguage(user.id);
+
     // generate the jwt token.
     let jwtToken = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: '1h' });
     let refreshToken = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: '7d' });
     //no need to store in database.
     //addToken(user.id, jwtToken);
     return res.json(
-      JSON.stringify({
+    JSON.stringify({
         "message": "Success",
+        "language": language,
         "jwtToken": jwtToken,
         "refreshToken": refreshToken,
-      })
-    )
+    }))
+
   }
   verify().catch((error) => {
     return res.json(
@@ -111,7 +114,78 @@ router.post('/POST/refreshtoken', (req, res) => {
   }
 });
 
+router.post('/POST/setLanguage', (req, res) => {
+    
+    //begin security check
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).send('Unauthorized: No token provided or malformed.');
+    }
+    const jwtToken = authHeader.split(' ')[1];
+    if (!checkToken(jwtToken)) {
+        return res.status(401).send('Unauthorized: Token is invalid or expired.');
+    }
+    // end security check
+    //curl -X POST -H "Content-Type: application/json" -d '{"language": "en"}' http://192.168.1.171:3000/rest/POST/setLanguage
+    
+    const decodedPayload = jwt.verify(jwtToken, jwtSecret);
+    const selectedLanguage = req.body.language;
+    const userId = decodedPayload.userId;
+    // now save the language to the user profile.
+    saveLanguageToUserProfile(userId, selectedLanguage);
+    
+    return res.status(200).json({
+        message: "Success",
+    });
+});
+
+router.get('/GET/populateStore', (req, res) => {
+  console.log("GET /GET/books called");
+  //begin security check
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).send('Unauthorized: No token provided or malformed.');
+  }
+  const jwtToken = authHeader.split(' ')[1];
+  if (!checkToken(jwtToken)) {
+      return res.status(401).send('Unauthorized: Token is invalid or expired.');
+  }
+  // end security check
+
+  db.collection('books').where("isParent", "==", true).where("visible", "==", true).orderBy("order", "asc").get()
+    .then(snapshot => {
+      let books = [];
+      if (snapshot.empty) {
+        return res.json(books);
+      }
+      snapshot.forEach(doc => {
+        books.push({ id: doc.id, ...doc.data() });
+      });
+      return res.json(books);
+    })
+    .catch(err => {
+      console.error('Error getting documents', err);
+      return res.status(500).send('Error retrieving users');
+    });
+  }
+);
+
+
+
+
 router.get('/GET/book', (req, res) => {
+  //begin security check
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).send('Unauthorized: No token provided or malformed.');
+  }
+  const jwtToken = authHeader.split(' ')[1];
+  if (!checkToken(jwtToken)) {
+      return res.status(401).send('Unauthorized: Token is invalid or expired.');
+  }
+  // end security check
+
+  
   let bookId = req.query.bookid;
   console.log("bookId " + bookId);
   console.log("GET /GET/book called");
@@ -137,6 +211,17 @@ router.get('/GET/book', (req, res) => {
 });
 
 router.get('/GET/books', (req, res) => {
+  //begin security check
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).send('Unauthorized: No token provided or malformed.');
+  }
+  const jwtToken = authHeader.split(' ')[1];
+  if (!checkToken(jwtToken)) {
+      return res.status(401).send('Unauthorized: Token is invalid or expired.');
+  }
+  // end security check
+
   console.log("GET /GET/books called");
   db.collection('books').where("isParent", "==", true).where("visible", "==", true).orderBy("order", "asc").get()
     .then(snapshot => {
@@ -158,6 +243,16 @@ router.get('/GET/books', (req, res) => {
 
 
 router.get('/GET/chapters', (req, res) => {
+  //begin security check
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).send('Unauthorized: No token provided or malformed.');
+  }
+  const jwtToken = authHeader.split(' ')[1];
+  if (!checkToken(jwtToken)) {
+      return res.status(401).send('Unauthorized: Token is invalid or expired.');
+  }
+  // end security check
 
   console.log("GET /GET/chapters called");
   let parent = req.query.parent;
@@ -183,6 +278,17 @@ router.get('/GET/chapters', (req, res) => {
 });
 
 router.get('/GET/chapterContentText', (req, res) => {
+  //begin security check
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).send('Unauthorized: No token provided or malformed.');
+  }
+  const jwtToken = authHeader.split(' ')[1];
+  if (!checkToken(jwtToken)) {
+      return res.status(401).send('Unauthorized: Token is invalid or expired.');
+  }
+  // end security check
+
   console.log('/GET/chapterContentText');
   let chapterId = req.query.id;
   db.collection('chaptertext').where("id", "==", chapterId).orderBy("order", "asc").get()
@@ -204,61 +310,12 @@ router.get('/GET/chapterContentText', (req, res) => {
 });
 
 
-router.post("/ocr", function (req, res) {
-  let vision = new googleVision();
-  vision.performOcrScan(req.body.url).then(response => {
-    try {
-      response.fullTextAnnotation.text;
-    } catch (error) {
-      return res.status(404).send({
-        error: 'error',
-        content: 'Error - Check that the URL is correct.'
-      });
-    }
+const checkToken = (jwtTokenValue) => {
+    const decodedPayload = jwt.verify(jwtTokenValue, jwtSecret);
+    let expiration_timestamp = decodedPayload.exp;
+    const currentTimeInSeconds = Math.floor(Date.now() / 1000);
+    const isExpired = decodedPayload.exp < currentTimeInSeconds;
+    
+    return !isExpired;
+}
 
-    if (!(response)) {
-      return res.status(404).send({
-        error: 'error',
-        content: 'Error - Check that the URL is correct.'
-      });
-    }
-    res.send(
-      JSON.stringify({
-        "content": response.fullTextAnnotation.text
-      })
-    );
-  });
-});
-
-// ocr rest call.
-router.post("/translate", function (req, res) {
-  let languageFrom = req.body.languageFrom;
-  let languageTo=req.body.languageTo;
-  let originalContent = req.body.originalContent;
-  let translate = new googleTranslate();
-  translate.performTranslation(languageFrom, languageTo, originalContent).then(response => {
-    //console.log(response);
-    if (!(response)) {
-      return res.status(404).send({
-        error: 'error',
-        content: 'Error - Check that the URL is correct.'
-      });
-    }
-    let translationValue = "";
-    for (const translation of response.translations) {
-      // add a line separator if there is more than one translation.
-      if(translationValue.toString().length > 1) {
-        translationValue += '\n____________\n';
-      }
-      translationValue += translation.translatedText;
-    }
-    console.log(translationValue);
-    res.send(
-      JSON.stringify({
-        "content": translationValue
-      })
-    );
-  });
-});
-
-module.exports = router;

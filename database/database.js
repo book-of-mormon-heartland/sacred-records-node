@@ -1,44 +1,88 @@
-const { Firestore, doc, deleteDoc } = require('@google-cloud/firestore');
-//import {  doc, deleteDoc } from "firebase/firestore";
-const settings = require('./../settings/settings.js');
+//import { Firestore, doc } from '@google-cloud/firestore';
+//import pkg from '@google-cloud/firestore';
+//const { doc } = pkg;
+//const settings = require("./../settings/settings.js");
+//import { isProduction, isDevelopment, GOOGLE_APPLICATION_CREDENTIALS } from "./../settings/settings.js"
+//import { constants } from "node:buffer";
+import 'dotenv/config'; 
+import admin from 'firebase-admin';
+import { resolve } from 'path';
 
-//console.log(settings)
 
-// works in docker
-/*
-const admin = require('firebase-admin');
-
-const serviceAccount = require('./../keys/trisummit-io-feea3939aa4d.json'); // Adjust the path as needed
-admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-});
-
-const db = admin.firestore();
-db.settings({
-  ignoreUndefinedProperties: true, // Optional: useful for preventing errors with undefined values
-  databaseId: 'authenticator', // Uncomment and replace with your actual database ID if
-});
-*/
-
-// code for dev with propers settings in the development environment including see readme.md
-require('dotenv').config();
-const admin = require('firebase-admin');
 const  GOOGLE_CREDENTIALS_PATH = process.env.GOOGLE_CREDENTIALS_PATH;
-
 var serviceAccountPath = GOOGLE_CREDENTIALS_PATH;
+/*
 if (serviceAccountPath) {
   const serviceAccount = require(serviceAccountPath);
   admin.initializeApp({
       credential: admin.credential.cert(serviceAccount)
   });
 }
+*/
+export let db = null;
 
-const db = admin.firestore();
-db.settings({
-  ignoreUndefinedProperties: true, // Optional: useful for preventing errors with undefined values
-  databaseId: 'sacredrecords', // Uncomment and replace with your actual database ID if
-});
 
+if (serviceAccountPath) {
+  // Use dynamic import() to load the JSON file
+  (async () => {
+    try {
+      // Use resolve to handle relative or absolute paths correctly
+      const absolutePath = resolve(serviceAccountPath);
+      const serviceAccount = await import(absolutePath, { with: { type: 'json' } });
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount.default)
+      });
+      db = admin.firestore();
+      db.settings({
+        ignoreUndefinedProperties: true, // Optional: useful for preventing errors with undefined values
+        databaseId: 'sacredrecords', // Uncomment and replace with your actual database ID if
+      });
+
+      console.log('Firebase Admin initialized successfully.');
+    } catch (error) {
+      console.error('Error initializing Firebase Admin:', error);
+    }
+  })();
+} else {
+  console.error('GOOGLE_CREDENTIALS_PATH is not set.');
+}
+
+
+
+
+
+
+
+export const addOrUpdateUser = async( user ) => {
+  const docRef = db.collection('users').doc(user.id);
+  await docRef.set( user, { merge: true } );
+}
+
+export const  getUserLanguage = async( userId) => {
+  const docRef = db.collection('users').doc(userId);
+  try {
+    const docSnap = await docRef.get();
+
+    if (docSnap.exists) {
+      // The document exists, so get its data
+      const userData = docSnap.data();
+      return userData?.language || "";
+    } else {
+      return "";
+    }
+  } catch (error) {
+    console.error("Error getting document:", error);
+  }
+  return "";
+}
+
+export const  saveLanguageToUserProfile = async( userId, language ) => {
+  const docRef = db.collection('users').doc(userId);
+  await docRef.update( { language: language } );
+}
+
+
+/*
 const addUser = async ( user ) => {
   const docRef = db.collection('users').doc(user.id);
   try {
@@ -48,6 +92,7 @@ const addUser = async ( user ) => {
     console.error('Error adding user:', error);
   }
 }
+*/
 
 const removeUser = async ( user ) => {
   const docRef = db.collection('users').doc(user.id);
@@ -163,20 +208,3 @@ const removeToken = async( userid ) => {
   }
 }
 
-
-
-module.exports = {
-  db,
-  addUser,
-  removeUser,
-  addBook,
-  removeBook,
-  addChapter,
-  removeChapter,
-  addChapterText,
-  removeChapterText,
-  addChapterAudio,
-  removeChapterAudio,
-  addToken,
-  removeToken
-};
