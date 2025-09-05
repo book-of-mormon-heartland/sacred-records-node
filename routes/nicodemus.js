@@ -1,23 +1,21 @@
-
-const express = require("express");
-const { text } = require('body-parser');
-const nicodemus = express.Router();
-const { OAuth2Client } = require('google-auth-library');
-const { db, addBook, removeBook, addChapter, removeChapter, addChapterText, removeChapterText, addChapterAudio, removeChapterAudio } = require("../database/database.js"); // Import the database module
-require('dotenv').config(); // Load environment variables
+import express from 'express';
+//const { text } = require('body-parser');
+export const nicodemus = express.Router();
+//const { OAuth2Client } = require('google-auth-library');
+//const { db, addBook, removeBook, addChapter, removeChapter, addChapterText, removeChapterText, addChapterAudio, removeChapterAudio } = require("../database/database.js"); // Import the database module
+import 'dotenv/config'; 
+import { db, addBook, removeBook, addChapter, removeChapter, addChapterText, removeChapterText, addChapterAudio, removeChapterAudio } from "../database/database.js"; // Import the database module
 
 
 const GOOGLE_WEB_CLIENT_ID = '376185747738-hced54r8i2jc4bjq428i54dp2g4uhnvo.apps.googleusercontent.com'; 
 const GOOGLE_ANDROID_CLIENT_ID = '376185747738-ha1jqq32roeta8g7c34c7koend7lmp5o.apps.googleusercontent.com'; 
 const GOOGLE_IOS_CLIENT_ID = '376185747738-t1nrjh269jqarco0grlo6a5vs8fcbf8b.apps.googleusercontent.com';
-const jwt = require('jsonwebtoken');
-const jwtSecret = process.env.JWT_SECRET;
 
 
 
 nicodemus.get("/addNicodemus", function (req, res) {
-    /*
-    book = {
+   
+    const book = {
         id: "gospel-of-nicodemus-en",
         title: "The Gospel of Nicodemus",
         subTitle: "Formerly called the ACTS of PONTIUS PILATE",
@@ -29,9 +27,15 @@ nicodemus.get("/addNicodemus", function (req, res) {
         parent: "",
         visible: true,
         language: "en",
+        price: "10.00",
+        inDevelopment: false,
+        category: "Apocryphal Records",
+        discountCode: "pure in heart",
+        discountPercent: 100,
     }
+    removeBook(book);
     addBook(book);
-
+/*
     chapter = {
         id: "gon-intro-en",
         title: "Introduction",
@@ -2025,4 +2029,3 @@ nicodemus.get("/removeNicodemus", function (req, res) {
     res.send("Nicodemus Removed");
 });
 
-module.exports = nicodemus;

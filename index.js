@@ -41,7 +41,10 @@ app.get('/', (req, res) => {
 
 app.use("/rest", router);
 
-//const nicodemus = require("./routes/nicodemus.js");
+import { theSacredTree } from "./routes/thesacredtree.js";
+app.use("/thesacredtree", theSacredTree);
+
+//import { nicodemus } from "./routes/nicodemus.js";
 //app.use("/nicodemus", nicodemus);
 //const miskwaabik = require("./routes/miskwaabik.js");
 //app.use("/miskwaabik", miskwaabik);

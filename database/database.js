@@ -76,11 +76,34 @@ export const  getUserLanguage = async( userId) => {
   return "";
 }
 
+export const  getUserPurchases = async( userId) => {
+  const docRef = db.collection('users').doc(userId);
+  try {
+    const docSnap = await docRef.get();
+    if (docSnap.exists) {
+      // The document exists, so get its data
+      const userData = docSnap.data();
+      return userData?.purchases || [];
+    } else {
+      return "";
+    }
+  } catch (error) {
+    console.error("Error getting document:", error);
+  }
+  return "";
+}
+
+
+
 export const  saveLanguageToUserProfile = async( userId, language ) => {
   const docRef = db.collection('users').doc(userId);
   await docRef.update( { language: language } );
 }
 
+export const  savePurchasesToUserProfile = async( userId, purchases ) => {
+  const docRef = db.collection('users').doc(userId);
+  await docRef.update( { purchases: purchases } );
+}
 
 /*
 const addUser = async ( user ) => {
@@ -94,7 +117,7 @@ const addUser = async ( user ) => {
 }
 */
 
-const removeUser = async ( user ) => {
+export const removeUser = async ( user ) => {
   const docRef = db.collection('users').doc(user.id);
   try {
     await  docRef.delete();
@@ -104,7 +127,7 @@ const removeUser = async ( user ) => {
   }
 }
 
-const addBook = async( book ) => {
+export const addBook = async( book ) => {
   const docRef = db.collection('books').doc(book.id);
   try {
     await  docRef.set(book);
@@ -114,7 +137,7 @@ const addBook = async( book ) => {
   }
 }
 
-const removeBook = async(book) => {
+export const removeBook = async(book) => {
   const docRef = db.collection('books').doc(book.id);
   try {
     await docRef.delete();
@@ -124,7 +147,7 @@ const removeBook = async(book) => {
   }
 }
 
-const addChapter = async( chapter ) => {
+export const addChapter = async( chapter ) => {
   const docRef = db.collection('chapters').doc(chapter.id);
   try {
     await docRef.set(chapter);
@@ -134,7 +157,7 @@ const addChapter = async( chapter ) => {
   }
 }
 
-const removeChapter = async(chapter) => {
+export const removeChapter = async(chapter) => {
   const docRef = db.collection('chapters').doc(chapter.id);
   try {
     await docRef.delete();
@@ -144,7 +167,7 @@ const removeChapter = async(chapter) => {
   }
 }
 
-const addChapterText = async( chapter ) => {
+export const addChapterText = async( chapter ) => {
   const docRef = db.collection('chaptertext').doc(chapter.id);
   try {
     await docRef.set(chapter);;
@@ -154,7 +177,7 @@ const addChapterText = async( chapter ) => {
   }
 }
 
-const removeChapterText = async (chapter) => {
+export const removeChapterText = async (chapter) => {
   const docRef = db.collection('chaptertext').doc(chapter.id);
   try {
     await docRef.delete();
@@ -164,7 +187,7 @@ const removeChapterText = async (chapter) => {
   }
 }
 
-const addChapterAudio = async( chapter ) => {
+export const addChapterAudio = async( chapter ) => {
   const docRef = db.collection('chapteraudio').doc(chapter.id);
   try {
     await docRef.set(chapter);
@@ -174,7 +197,7 @@ const addChapterAudio = async( chapter ) => {
   }
 }
 
-const removeChapterAudio = async(chapter) => {
+export const removeChapterAudio = async(chapter) => {
   const docRef = db.collection('chapteraudio').doc(chapter.id);
   try {
     await docRef.delete();
@@ -185,7 +208,7 @@ const removeChapterAudio = async(chapter) => {
 }
 
 
-const addToken = async( userid, token ) => {
+export const addToken = async( userid, token ) => {
   const docRef = db.collection('tokens').doc(userid);
   try {
     await docRef.set({
@@ -198,7 +221,7 @@ const addToken = async( userid, token ) => {
   }
 }
 
-const removeToken = async( userid ) => {
+export const removeToken = async( userid ) => {
   const res = db.collection('tokens').doc(userid);
   try {
     await docRef.delete();

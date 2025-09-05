@@ -45,9 +45,16 @@ router.post('/POST/googlelogin', (req, res) => {
         }));
     }
     // Add or update the user.  Same thing here.
+    //user.purchases=user.purchases || ['gospel-of-nicodemus-en', 'the-nephite-record-en', 'the-sacred-tree-en']
     addOrUpdateUser(user);
     let language = await getUserLanguage(user.id);
-
+    /*
+    let purchases = await getUserPurchases(user.id);
+    if(purchases.length===0 ) {
+      user.purchases = ['the-sacred-tree-en'];
+      addOrUpdateUser(user);
+    }
+    */
     // generate the jwt token.
     let jwtToken = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: '1h' });
     let refreshToken = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: '7d' });
@@ -140,7 +147,7 @@ router.post('/POST/setLanguage', (req, res) => {
 });
 
 router.get('/GET/populateStore', (req, res) => {
-  console.log("GET /GET/books called");
+  console.log("GET /GET/populateStore called");
   //begin security check
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -151,27 +158,41 @@ router.get('/GET/populateStore', (req, res) => {
       return res.status(401).send('Unauthorized: Token is invalid or expired.');
   }
   // end security check
+  const decodedPayload = jwt.verify(jwtToken, jwtSecret);
+  const userId=decodedPayload.userId;
+  let books=[];
 
-  db.collection('books').where("isParent", "==", true).where("visible", "==", true).orderBy("order", "asc").get()
-    .then(snapshot => {
-      let books = [];
-      if (snapshot.empty) {
-        return res.json(books);
-      }
-      snapshot.forEach(doc => {
-        books.push({ id: doc.id, ...doc.data() });
-      });
-      return res.json(books);
-    })
-    .catch(err => {
-      console.error('Error getting documents', err);
-      return res.status(500).send('Error retrieving users');
+  db.collection('users').where("id", "==", userId).get()
+  .then(snapshot => {
+    let users = [];
+    if (snapshot.empty) {
+      //console.log("No matching documents.");
+      //return res.json(users);
+    }
+    snapshot.forEach(user => {
+      users.push({ id: user.id, ...user.data() });
     });
-  }
-);
-
-
-
+    let purchases = users[0].purchases || [];
+    //
+    //.where("id", not in , user.purchases)
+    db.collection('books').where("isParent", "==", true).where("visible", "==", true).where('id', 'not-in', purchases).orderBy("order", "asc").get()
+      .then(snapshot => {
+        let books = [];
+        if (snapshot.empty) {
+          return res.json(books);
+        }
+        snapshot.forEach(doc => {
+          books.push({ id: doc.id, ...doc.data() });
+        });
+        return res.json(books);
+      })
+      .catch(err => {
+        console.error('Error getting documents', err);
+        return res.status(500).send('Error retrieving users');
+      });
+    }  
+  );
+});
 
 router.get('/GET/book', (req, res) => {
   //begin security check
@@ -187,8 +208,6 @@ router.get('/GET/book', (req, res) => {
 
   
   let bookId = req.query.bookid;
-  console.log("bookId " + bookId);
-  console.log("GET /GET/book called");
   
   db.collection('books').where("parent", "==", bookId ).where("visible", "==", true).orderBy("order", "asc").get()
     .then(snapshot => {
@@ -209,6 +228,71 @@ router.get('/GET/book', (req, res) => {
       return res.status(500).send('Error retrieving book');
     });
 });
+
+router.get('/GET/bookshelf', (req, res) => {
+  //begin security check
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).send('Unauthorized: No token provided or malformed.');
+  }
+  const jwtToken = authHeader.split(' ')[1];
+  if (!checkToken(jwtToken)) {
+      return res.status(401).send('Unauthorized: Token is invalid or expired.');
+  }
+  // end security check
+  // get the user and find the [] of books.
+  const decodedPayload = jwt.verify(jwtToken, jwtSecret);
+  const userId=decodedPayload.userId;
+  let books=[];
+
+  db.collection('users').where("id", "==", userId).get()
+  .then(snapshot => {
+    let users = [];
+    if (snapshot.empty) {
+      //console.log("No matching documents.");
+      //return res.json(users);
+    }
+    snapshot.forEach(user => {
+      users.push({ id: user.id, ...user.data() });
+    });
+    let purchases = users[0].purchases || [];
+    // now get each book that matches the purchase IDs.
+    if(purchases.length === 0) {
+      return res.json([]);
+    }
+
+    // Map each purchase ID to a Firestore query promise.
+    let bookPromises = purchases.map(bookId => {
+      // Return the promise from the map callback.
+      return db.collection('books').doc(bookId).get()
+        .then(doc => {
+          // Check if the document exists and return the data.
+          if (doc.exists) {
+            return { id: doc.id, ...doc.data() };
+          }
+          // Return null or handle the non-existent case.
+          return null;
+        })
+        .catch(err => {
+          console.error("Error fetching book:", err);
+          return null;
+        });
+    });
+
+    // Wait for all promises to resolve.
+    Promise.all(bookPromises).then(booksArray => {
+      // Filter out any null values from the array (for non-existent documents).
+      const books = booksArray.filter(book => book !== null);
+      //console.log(books);
+      return res.json(books);
+    }).catch(err => {
+      console.error("Error with Promise.all:", err);
+      return res.status(500).send("An error occurred");
+    });
+  });
+});
+
+
 
 router.get('/GET/books', (req, res) => {
   //begin security check
