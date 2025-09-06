@@ -19,7 +19,7 @@ theSacredTree.get("/addTheSacredTree", function (req, res) {
         id: "the-sacred-tree-en",
         title: "The Sacred Tree",
         subTitle: "Reflections on Native American Spirituality",
-        thumbnail: "https://storage.googleapis.com/sacred-records/books/jewish-records/nicodemus-thumbnail.jpg",
+        thumbnail: "https://storage.googleapis.com/sacred-records/books/the-sacred-tree/book-the-sacred-tree-thumbnail-3.png",
         thumbnailTitle: "Sacred Tree",
         authors: ["Phil Lane Jr.",
                     "Lee Brown",
@@ -267,7 +267,7 @@ theSacredTree.get("/addTheSacredTree", function (req, res) {
         visible: true
     }
     addChapter(chapter);
-    */
+
 
     chapter = {
         id: "tst-chapter-3-en",
@@ -291,10 +291,74 @@ theSacredTree.get("/addTheSacredTree", function (req, res) {
             "The meanings of the Sacred Tree may be organized into four major categories. These categories may be easily viewed as movements in the cycle of human development from our birth toward our unity with the wholeness of creation. The four great meanings of the Sacred Tree are:",
             "[[image:https://storage.googleapis.com/sacred-records/books/the-sacred-tree/the-sacred-tree-19.png]]", 
             "We will now begin our journey toward a better understanding of the four great meanings of the medicine wheel of the Sacred Tree.",
+            "**The Protection of the Sacred Tree**",
+            "The Sacred Tree is a symbol of protection. The shade of the tree provides protection from the sun. The tree is a source of material for homes and ceremonial lodges which provide physical and spiritual protection. The tree provides firewood which gives protection from the cold. The bark of the Sacred Tree represents protection from the outside world. The Sacred Tree provides the material from which kayaks and canoes are made. The greatest protection of the Sacred Tree is to provide a gathering place and central pole of unity for the people.",
+            "Symbolically, the Sacred Tree represents a gathering place for the many different tribes and peoples of the world. The Sacred Tree provides a place of protection in the world, a place of peace, contemplation, and centering. Like our mother’s womb which provided nourishment and protection during the earliest days of our life, the Sacred Tree may be thought of as a womb of protection which gives birth to our values and potentialities as unique human beings.",
+            "The process of developing our uniqueness through the teachings of the Sacred Tree gives rise to a vision, not of what we are, but of what we can become. That vision becomes the path toward our wholeness. Thus we see in the symbolic protection of the Sacred Tree the beginning of our wholeness and the emergence of the seed of our potential.",
+            "**The Nourishment of the Sacred Tree**",
+            "The second symbolic meaning of the Sacred Tree is the nourishment we need to live and grow. This nourishment is symbolically represented by the fruit of the tree. On one level the fruit of the Sacred Tree represents the nourishment a mother gives to her children and all the care children should receive as they are growing up.",
+            "A deeper meaning of the fruit is the nurturing human beings receive through interactions with the human, physical and spiritual environments. These environments are often symbolically represented by the mother. Hence, interaction with the tree and eat ing the fruit of the tree symbolically represent our interaction with all the aspects of life that nourish and sustain our growth and development.",
+            "The leaves of the Sacred Tree represent people. Eventually the leaves of the tree fall to earth and provide nourishment for the continued health, growth and future flowering of the Sacred Tree. Symbolically, this represents the passing of the generations and the spiritual teachings they leave behind for the health and growth of those that come after them. This symbolic meaning of the tree emphasizes the necessity of using the accumulated wisdom of the past to nourish the present and to plan for the future. This wisdom arises from the hard-won experience of countless generations and is taught through the songs, dances, stories, prayers and ceremonies of the people. Thus this wisdom provides nourishment for the development of each generation’s potentiality.",
+            "Another symbolic teaching of the leaf is sacrifice. The leaves sacrifice themselves for the future of the Sacred Tree. This is symbolic of the ceremonial sacrifices made on behalf of the life of the tribe and the health of the community. This teaching reflects the belief that a human being’s growth during his life is equal to his service and sacrifice for others. Therefore, giving and sacrifice not only provide a positive service for the community, but also create further growth in the individual during his existence in this creation.",
+            "**The Growth of the Sacred Tree**",
+            "The third symbolic meaning of the Sacred Tree is growth. The Sacred Tree symbolizes the importance of pursuing life experiences which provide positive growth and development. The Sacred Tree grows from its central core outward and upward. This inner growth of the tree symbolizes the need all human beings have for an inner life. Human beings grow in the qualities of the four directions, physically, mentally, emotionally and spiritually, as a result of inner reflection and change. Indeed, changes in a human being often occur internally and are then manifested in the personality of the individual. These changes are often hidden from view while they are occurring just as the inner growth of the Sacred Tree is hidden. However, we can seethe result of this inner growth in the exterior of the tree. Thus, our outer life can be understood as a reflection of the development of our inner being. By deepening and developing the qualities of the four directions within ourselves, we grow to reflectthese spiritual qualities in our daily lives. This is one of the primary spiritual teachings of the medicine wheel represented symbolically in the Sacred Tree.",
+            "The roots and limbs of the Sacred Tree grow toward the four directions. This also represents growth in the spiritual qualities and teachings of the medicine wheel. The growth of these roots and limbs can also be seen as a representation of these qualities reflected in our life’s work.",
+            "The Sacred Tree teaches us the importance of having great respect for our inner spiritual growth as human beings. The inner growth of the Sacred Tree sends forth its roots and limbs, as if in prayer, to the four directions. Our own inner growth is manifested in our daily life and affects our relationship to thefour directions. Symbolically this represents the four dimensions of learning and the development of the four aspects of human nature represented on the medicine wheel.",
+            "In another sense the growth of the tree represents cycles of time and of life. The changes in the Sacred Tree during the changing seasons of the year represent the many changes in our life as we grow and develop in our relationship to creation, a life-long process of becoming our own true self. This is an eternal process that reaches beyond life itself. The Sacred Tree is rooted in Mother Earth but reaches upward toward a limitless universe. This symbolic growth developed through struggle and self-determination is ever rewarded by the development of many new and wonderful gifts for ourselves and our communities.",
+            "**The Wholeness of the Sacred Tree**",
+            "The fourth meaning of the Sacred Tree is wholeness. Symbolically the wholeness of the Sacred Tree is the unity and centering of the qualities of the four directions in the human being. This meaning is reflected in the words of Lamedeer about the Sacred Tree chosen for the sun dance pole:",
+            "[[poem: When the tree finally arrived in the camp circle a great shout of joy rose from all the people...|The top of the pole was decorated with strips of coloured cloth, one each for the four corners of the earth. (Lamedeer)]]",
+            "The Sacred Tree represents the Great Spirit as the center pole of creation, a center for balancing and understanding ourselves as human beings. The teachings of the Sacred Tree provide a foundation for organizing our values and a safe path for developing and protecting the wholeness of our being. This balance and understanding is based on the unity of the elements of creation brought to life in the tree. This unity is achieved in ourselves by understanding and balancing the opposite yet related qualities of life and in our process of growth as human beings. From one point of view the unseen roots in Mother Earth represent the invisible aspects of our being and the part of the Sacred Tree above ground represents those aspects that are visible. When we understand and balance these parts of our self, the tree of our being will grow rich with abundant fruit that contains the seeds of yet further growth, development and wholeness.",
+            "In truth, we begin our lives with wholeness, but we have experiences as individuals in our families, tribes, and from society that sometimes shatter and fragment this wholeness. If we have been hurt, this wholeness can be restored and its development enhanced through the natural healing processes and spiritual lessons contained within the teachings of the Sacred Tree.",
+            "**Conclusion**",
+            "We began by stating that the Sacred Tree provides enough meaning for a lifetime of reflection. Here we have only briefly touched the surface of the ocean of its symbolic meanings. Still, we can begin to see the depths of its meanings as if looking into the surface waters of a deep pooi. To reflect and act upon the teachings of the Sacred Tree is to renew the life of humanity. To use this symbol is to move toward the wholeness promised in the prophecies of this time; a time of purification and renewal of all life in creation; a time of gathering together through the protection, nourishment, growth and wholeness of the Sacred Tree.",
+            "[[image:https://storage.googleapis.com/sacred-records/books/the-sacred-tree/the-sacred-tree-20.png]]",
         ],
     }
     addChapterText(chapter);
     addChapterAudio(chapter);
+*/
+
+    chapter = {
+        id: "tst-chapter-4-en",
+        title: "Chapter 4",
+        subTitle: "First Principles",
+        order: 6,
+        parent: "the-sacred-tree-en",
+        visible: true
+    }
+    addChapter(chapter);
+
+
+    chapter = {
+        id: "tst-chapter-4-en",
+        title: "Chapter 4",
+        subTitle: "First Principles",
+        parent: "the-sacred-tree-en",
+        order: 6,
+        visible: true,
+        previousChapter: "tst-chapter-3-en",
+        followingChapter: "tst-chapter-5-en",
+        content: [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+        ],
+    }
+    addChapterText(chapter);
+    addChapterAudio(chapter);
+
+
 /*
     chapter = {
         id: "gon-chapter-2-en",

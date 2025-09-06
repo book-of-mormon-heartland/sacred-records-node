@@ -4,7 +4,7 @@ import express from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import 'dotenv/config'; 
 import jwt from 'jsonwebtoken';
-import { db, addOrUpdateUser, getUserLanguage, saveLanguageToUserProfile } from "../database/database.js"; // Import the database module
+import { db, addOrUpdateUser, getUserLanguage, saveLanguageToUserProfile, getUserPurchases } from "../database/database.js"; // Import the database module
 
 
 const GOOGLE_WEB_CLIENT_ID = '376185747738-hced54r8i2jc4bjq428i54dp2g4uhnvo.apps.googleusercontent.com'; 
@@ -46,8 +46,28 @@ router.post('/POST/googlelogin', (req, res) => {
     }
     // Add or update the user.  Same thing here.
     //user.purchases=user.purchases || ['gospel-of-nicodemus-en', 'the-nephite-record-en', 'the-sacred-tree-en']
-    addOrUpdateUser(user);
+    await addOrUpdateUser(user);
     let language = await getUserLanguage(user.id);
+    let purchases = await getUserPurchases(user.id);
+    if(!purchases) {
+      console.log("log: no purchases array found, setting to empty array");
+      purchases = ["the-sacred-tree-en"];
+      user.purchases = purchases;
+      await addOrUpdateUser(user);
+    }
+    console.log(purchases);
+/*
+purchases
+(array) 
+0: "gospel-of-nicodemus-en"
+(string) 
+1: "the-nephite-record-en"
+(string) 
+2: "the-sacred-tree-en"
+*/
+
+
+
     /*
     let purchases = await getUserPurchases(user.id);
     if(purchases.length===0 ) {
@@ -70,6 +90,7 @@ router.post('/POST/googlelogin', (req, res) => {
 
   }
   verify().catch((error) => {
+    console.log('Error verifying token:', error);
     return res.json(
       JSON.stringify({
         "message": error,

@@ -83,7 +83,7 @@ export const  getUserPurchases = async( userId) => {
     if (docSnap.exists) {
       // The document exists, so get its data
       const userData = docSnap.data();
-      return userData?.purchases || [];
+      return userData.purchases;
     } else {
       return "";
     }
