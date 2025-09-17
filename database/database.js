@@ -58,6 +58,13 @@ export const addOrUpdateUser = async( user ) => {
   await docRef.set( user, { merge: true } );
 }
 
+// replace the user object with this one.
+export const updateUser = async( user ) => {
+  const docRef = db.collection('users').doc(user.id);
+  await docRef.set( user );
+}
+
+
 export const  getUserLanguage = async( userId) => {
   const docRef = db.collection('users').doc(userId);
   try {
@@ -76,6 +83,24 @@ export const  getUserLanguage = async( userId) => {
   return "";
 }
 
+export const  getUser= async( userId) => {
+  const docRef = db.collection('users').doc(userId);
+  try {
+    const docSnap = await docRef.get();
+    if (docSnap.exists) {
+      // The document exists, so get its data
+      const userData = docSnap.data();
+      return userData;
+    } else {
+      return "";
+    }
+  } catch (error) {
+    console.error("Error getting user:", error);
+  }
+  return "";
+}
+
+
 export const  getUserPurchases = async( userId) => {
   const docRef = db.collection('users').doc(userId);
   try {
@@ -93,6 +118,31 @@ export const  getUserPurchases = async( userId) => {
   return "";
 }
 
+export const  addPurchase = async( userId, bookId, bookTitle, code, paidPrice) => {
+  console.log("addPurchase");
+  /*
+userId, req.body.id, req.body.bookTitle, req.body.code, req.body.bookPrice
+  */
+  let now = new Date();
+  let systemTime = now.toISOString();
+  const readableDate = now.toDateString();
+  const docRef = db.collection('purchases').doc(systemTime);
+  try {
+    let purchase = {
+      userId: userId,
+      bookId: bookId,
+      bootTitle: bookTitle,
+      code: code,
+      paidPrice: paidPrice,
+      time : systemTime,
+      date : readableDate
+    }
+    await  docRef.set(purchase);
+  } catch (error) {
+    console.error('Error adding purchase:', error);
+  }
+}
+
 
 
 export const  saveLanguageToUserProfile = async( userId, language ) => {
@@ -105,17 +155,6 @@ export const  savePurchasesToUserProfile = async( userId, purchases ) => {
   await docRef.update( { purchases: purchases } );
 }
 
-/*
-const addUser = async ( user ) => {
-  const docRef = db.collection('users').doc(user.id);
-  try {
-    await  docRef.set(user);
-    console.log('User successfully added!');
-  } catch (error) {
-    console.error('Error adding user:', error);
-  }
-}
-*/
 
 export const removeUser = async ( user ) => {
   const docRef = db.collection('users').doc(user.id);

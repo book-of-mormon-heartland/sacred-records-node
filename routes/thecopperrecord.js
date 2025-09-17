@@ -1,5 +1,5 @@
 import express from 'express';
-export const theCopperRecord = express.Router();
+export const copper = express.Router();
 import 'dotenv/config'; 
 import { db, addBook, removeBook, addChapter, removeChapter, addChapterText, removeChapterText, addChapterAudio, removeChapterAudio } from "../database/database.js"; // Import the database module
 
@@ -8,16 +8,14 @@ const GOOGLE_WEB_CLIENT_ID = '376185747738-hced54r8i2jc4bjq428i54dp2g4uhnvo.apps
 const GOOGLE_ANDROID_CLIENT_ID = '376185747738-ha1jqq32roeta8g7c34c7koend7lmp5o.apps.googleusercontent.com'; 
 const GOOGLE_IOS_CLIENT_ID = '376185747738-t1nrjh269jqarco0grlo6a5vs8fcbf8b.apps.googleusercontent.com';
 
-
-
-theCopperRecord.get("/addMiskwaabik", function (req, res) {
-
+copper.get("/addCopper", function (req, res) {
+    let book = {};
     book = {
         id: "miskwaabik-en",
         title: "Miskwaabik Ozhibii'iwe",
         subTitle: "The Copper Records",
         image: "https://storage.googleapis.com/sacred-records/books/miskwaabik/the-copper-record-615x771.jpg",
-        thumbnail: "https://storage.googleapis.com/sacred-records/books/miskwaabik/the-copper-record-170x213-2.jpg",
+        thumbnail: "https://storage.googleapis.com/sacred-records/books/miskwaabik/the-copper-record-170x213.jpg",
         thumbnailTitle: "Miskwaabik Ozhibii'iwe",
         Description: "Translated by the Annishinabe Record Keepers.",
         priceText: "$40.00",
@@ -29,8 +27,8 @@ theCopperRecord.get("/addMiskwaabik", function (req, res) {
         visible: true,
         language: "en",
     }
-    removeBook(book);
-    //addBook(book);
+    //removeBook(book);
+    addBook(book);
 /*
     book = {
         id: "miskwaabik-teaching-one-en",
@@ -1153,7 +1151,7 @@ theCopperRecord.get("/addMiskwaabik", function (req, res) {
     res.send("Miskwaabik Added");
 })
 
-theCopperRecord.get("/removeMiskwaabik", function (req, res) {
+copper.get("/removeMiskwaabik", function (req, res) {
 
     book = {
         id: "miskwaabik-en",
@@ -1340,4 +1338,4 @@ theCopperRecord.get("/removeMiskwaabik", function (req, res) {
     res.send("Miskwaabik Removed");
 });
 
-module.exports = miskwaabik;
+//module.exports = copper;

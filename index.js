@@ -39,15 +39,20 @@ app.get('/', (req, res) => {
 });
 
 
+import { paymentRoutes } from './routes/paymentRoutes.js';
+app.use('/payments', paymentRoutes);
+
 app.use("/rest", router);
 
-import { theSacredTree } from "./routes/thesacredtree.js";
-app.use("/thesacredtree", theSacredTree);
+//import { theSacredTree } from "./routes/thesacredtree.js";
+//app.use("/thesacredtree", theSacredTree);
+//import { copper } from "./routes/thecopperrecord.js";
+//app.use("/copper", copper);
+import { handsomeLake } from "./routes/handsomelake.js";
+app.use("/handsomeLake", handsomeLake);
 
 //import { nicodemus } from "./routes/nicodemus.js";
 //app.use("/nicodemus", nicodemus);
-//const miskwaabik = require("./routes/miskwaabik.js");
-//app.use("/miskwaabik", miskwaabik);
 //const nephiteRecord = require("./routes/nephiterecord.js");
 //app.use("/nephiterecord", nephiteRecord);
 //const newtestament = require("./routes/newtestament.js");

@@ -24,6 +24,7 @@ nephiteRecord.get("/addNephiteRecord", function (req, res) {
     id: "nr-introduction-en",
     title: "Introduction",
     subTitle: "",
+    image: "https://storage.googleapis.com/sacred-records/books/nephite-record-1840/nephite-record-image.jpg",
     thumbnail: "https://storage.googleapis.com/sacred-records/books/nephite-record/intro-thumbnail.jpg",
     thumbnailTitle: "Intro",
     isParent: false,

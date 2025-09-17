@@ -5,12 +5,13 @@ import { OAuth2Client } from 'google-auth-library';
 import 'dotenv/config'; 
 import jwt from 'jsonwebtoken';
 import { db, addOrUpdateUser, getUserLanguage, saveLanguageToUserProfile, getUserPurchases } from "../database/database.js"; // Import the database module
+import { checkToken } from "../security/security.js"; // Import the database module
 
-
-const GOOGLE_WEB_CLIENT_ID = '376185747738-hced54r8i2jc4bjq428i54dp2g4uhnvo.apps.googleusercontent.com'; 
-const GOOGLE_ANDROID_CLIENT_ID = '376185747738-ha1jqq32roeta8g7c34c7koend7lmp5o.apps.googleusercontent.com'; 
-const GOOGLE_IOS_CLIENT_ID = '376185747738-t1nrjh269jqarco0grlo6a5vs8fcbf8b.apps.googleusercontent.com';
+const GOOGLE_WEB_CLIENT_ID  = process.env.GOOGLE_WEB_CLIENT_ID;
+const GOOGLE_ANDROID_CLIENT_ID = process.env.GOOGLE_ANDROID_CLIENT_ID;
+const GOOGLE_IOS_CLIENT_ID = process.env.GOOGLE_IOS_CLIENT_ID;
 const jwtSecret = process.env.JWT_SECRET;
+
 
 export const router = express.Router();
 
@@ -21,7 +22,6 @@ router.get("/", function (req, res) {
 
 
 router.post('/POST/googlelogin', (req, res) => {
-
   // retrieve the token
   const token = req.body.token;
   const user = req.body.user;
@@ -56,25 +56,6 @@ router.post('/POST/googlelogin', (req, res) => {
       await addOrUpdateUser(user);
     }
     console.log(purchases);
-/*
-purchases
-(array) 
-0: "gospel-of-nicodemus-en"
-(string) 
-1: "the-nephite-record-en"
-(string) 
-2: "the-sacred-tree-en"
-*/
-
-
-
-    /*
-    let purchases = await getUserPurchases(user.id);
-    if(purchases.length===0 ) {
-      user.purchases = ['the-sacred-tree-en'];
-      addOrUpdateUser(user);
-    }
-    */
     // generate the jwt token.
     let jwtToken = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: '1h' });
     let refreshToken = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: '7d' });
@@ -103,6 +84,7 @@ purchases
 
 
 router.post('/POST/refreshtoken', (req, res) => {
+  console.log("Called Refresh token");
   const jwtToken = req.headers['authorization'];
   try {
       const payload = jwt.verify(jwtToken, jwtSecret);
@@ -249,6 +231,43 @@ router.get('/GET/book', (req, res) => {
       return res.status(500).send('Error retrieving book');
     });
 });
+
+router.get('/GET/bookForReview', (req, res) => {
+  //begin security check
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).send('Unauthorized: No token provided or malformed.');
+  }
+  const jwtToken = authHeader.split(' ')[1];
+  if (!checkToken(jwtToken)) {
+      return res.status(401).send('Unauthorized: Token is invalid or expired.');
+  }
+  // end security check
+
+  
+  let bookId = req.query.id;
+  
+  db.collection('books').where("id", "==", bookId ).where("visible", "==", true).orderBy("order", "asc").get()
+    .then(snapshot => {
+      if (snapshot.empty) {
+        console.log('No matching documents.');
+        //return res.status(404).send('No Books found');
+        return res.json([]);
+      }
+
+      let book = [];
+      snapshot.forEach(doc => {
+        book.push({ id: doc.id, ...doc.data() });
+      });
+      return res.json(book);
+    })
+    .catch(err => {
+      console.error('Error getting documents', err);
+      return res.status(500).send('Error retrieving book');
+    });
+});
+
+
 
 router.get('/GET/bookshelf', (req, res) => {
   //begin security check
@@ -415,12 +434,4 @@ router.get('/GET/chapterContentText', (req, res) => {
 });
 
 
-const checkToken = (jwtTokenValue) => {
-    const decodedPayload = jwt.verify(jwtTokenValue, jwtSecret);
-    let expiration_timestamp = decodedPayload.exp;
-    const currentTimeInSeconds = Math.floor(Date.now() / 1000);
-    const isExpired = decodedPayload.exp < currentTimeInSeconds;
-    
-    return !isExpired;
-}
 
