@@ -47,12 +47,6 @@ if (serviceAccountPath) {
   console.error('GOOGLE_CREDENTIALS_PATH is not set.');
 }
 
-
-
-
-
-
-
 export const addOrUpdateUser = async( user ) => {
   const docRef = db.collection('users').doc(user.id);
   await docRef.set( user, { merge: true } );
@@ -63,7 +57,6 @@ export const updateUser = async( user ) => {
   const docRef = db.collection('users').doc(user.id);
   await docRef.set( user );
 }
-
 
 export const  getUserLanguage = async( userId) => {
   const docRef = db.collection('users').doc(userId);
@@ -100,6 +93,53 @@ export const  getUser= async( userId) => {
   return "";
 }
 
+export const  getBook = async( bookId ) => {
+  const docRef = db.collection('books').doc(bookId);
+  try {
+    const docSnap = await docRef.get();
+    if (docSnap.exists) {
+      // The document exists, so get its data
+      const bookData = docSnap.data();
+      return bookData;
+    } else {
+      return "";
+    }
+  } catch (error) {
+    console.error("Error getting document:", error);
+  }
+  return "";
+}
+
+export const createBookmark = async( userId, bookId, bookTitle, chapterId, chapterTitle, positionY ) => {
+  let bookmark = {
+    userId: userId,
+    bookId: bookId,
+    bookTitle: bookTitle,
+    chapterId: chapterId,
+    chapterTitle: chapterTitle,
+    positionY: positionY
+  }
+  const docRef = db.collection('bookmarks').doc(userId + "-" + bookId);
+  try {
+    await  docRef.set(bookmark);
+    console.log('Bookmark successfully Added!');
+    return "success";
+  } catch (error) {
+    console.error('Error adding purchase:', error);
+    return "error";
+  }
+}
+
+export const removePreviousBookmark = async(bookmarkId) => {
+  const docRef = db.collection('bookmarks').doc(bookmarkId);
+  try {
+    await docRef.delete();
+    console.log('Bookmark successfully deleted!');
+  } catch (error) {
+    console.error('Error deleting bookmark:', error);
+  }
+}
+
 
 export const  getUserPurchases = async( userId) => {
   const docRef = db.collection('users').doc(userId);
@@ -118,10 +158,10 @@ export const  getUserPurchases = async( userId) => {
   return "";
 }
 
-export const  addPurchase = async( userId, bookId, bookTitle, code, paidPrice) => {
+export const  addPurchase = async( userId, name, email, bookId, bookTitle, code, paidPrice) => {
   console.log("addPurchase");
   /*
-userId, req.body.id, req.body.bookTitle, req.body.code, req.body.bookPrice
+    userId, name, req.body.id, req.body.bookTitle, req.body.code, req.body.bookPrice
   */
   let now = new Date();
   let systemTime = now.toISOString();
@@ -130,6 +170,8 @@ userId, req.body.id, req.body.bookTitle, req.body.code, req.body.bookPrice
   try {
     let purchase = {
       userId: userId,
+      name: name,
+      email: email,
       bookId: bookId,
       bootTitle: bookTitle,
       code: code,
@@ -143,8 +185,6 @@ userId, req.body.id, req.body.bookTitle, req.body.code, req.body.bookPrice
   }
 }
 
-
-
 export const  saveLanguageToUserProfile = async( userId, language ) => {
   const docRef = db.collection('users').doc(userId);
   await docRef.update( { language: language } );
@@ -154,7 +194,6 @@ export const  savePurchasesToUserProfile = async( userId, purchases ) => {
   const docRef = db.collection('users').doc(userId);
   await docRef.update( { purchases: purchases } );
 }
-
 
 export const removeUser = async ( user ) => {
   const docRef = db.collection('users').doc(user.id);

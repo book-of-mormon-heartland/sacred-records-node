@@ -65,10 +65,18 @@ paymentRoutes.post('/createOrder', async (req, res) => {
     let user = await getUser(userId);
     let purchases = user.purchases;
     user.purchases.push(req.body.id);
+    /*
+    Todo:  These to items need to match to the price either needs to match db entry 
+    for book or the code and discount price need to match.  
+    Otherwise someone is hacking purchases at discounts unauthorized.
+    req.body.bookPrice
+    req.body.code
+    */
+
     await updateUser(user);
     
     // create a purchases entry
-    await addPurchase( userId, req.body.id, req.body.bookTitle, req.body.code, req.body.bookPrice);
+    await addPurchase( userId, user.name, user.email, req.body.id, req.body.bookTitle, req.body.code, req.body.bookPrice);
     return res.json({
       message:"success"
     });

@@ -177,8 +177,14 @@ router.get('/GET/populateStore', (req, res) => {
     });
     let purchases = users[0].purchases || [];
     //
-    //.where("id", not in , user.purchases)
-    db.collection('books').where("isParent", "==", true).where("visible", "==", true).where('id', 'not-in', purchases).orderBy("order", "asc").get()
+    //.where("id", not in , user.purchase
+
+    db.collection('books')
+      .where("category", "==", "for-sale")
+      .where("isParent", "==", true)
+      .where("visible", "==", true)
+      .where('id', 'not-in', purchases)
+      .orderBy("order", "asc").get()
       .then(snapshot => {
         let books = [];
         if (snapshot.empty) {
@@ -347,7 +353,7 @@ router.get('/GET/books', (req, res) => {
   // end security check
 
   console.log("GET /GET/books called");
-  db.collection('books').where("isParent", "==", true).where("visible", "==", true).orderBy("order", "asc").get()
+  db.collection('books').where("category", "!=", "quetzal-condor").where("isParent", "==", true).where("visible", "==", true).orderBy("order", "asc").get()
     .then(snapshot => {
       let books = [];
       if (snapshot.empty) {

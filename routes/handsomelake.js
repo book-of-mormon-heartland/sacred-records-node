@@ -31,10 +31,10 @@ handsomeLake.get("/addHandsomeLake", function (req, res) {
     }
     addBook(book);
 
-
+*/
     chapter = {
         id: "handsome-lake-cover-en",
-        title: "Introduction",
+        title: "Cover Images",
         subTitle: "The Code of Handsome Lake, The Seneca Prophet",
         parent: "handsome-lake-en",
         order: 1,
@@ -55,10 +55,11 @@ handsomeLake.get("/addHandsomeLake", function (req, res) {
             "[[image:https://storage.googleapis.com/sacred-records/books/handsome-lake/2.jpg]]",
             "[[image:https://storage.googleapis.com/sacred-records/books/handsome-lake/3.jpg]]",
             "[[image:https://storage.googleapis.com/sacred-records/books/handsome-lake/4.jpg]]",
+            "[[image:https://storage.googleapis.com/sacred-records/books/handsome-lake/5.jpg]]",
         ],
     }
     addChapterText(chapter)
-*/
+
     chapter = {
         id: "handsome-lake-intro-en",
         title: "Introduction",
@@ -79,8 +80,7 @@ handsomeLake.get("/addHandsomeLake", function (req, res) {
         previousChapter: "handsome-lake-cover-en",
         followingChapter: "handsome-lake-1-en",
         content: [
-            "[[image:https://storage.googleapis.com/sacred-records/books/handsome-lake/5.jpg]]",
-            "The Gai'wiio is the record of the teachings of Handsome Lake,the Seneca prophet, and purports to be an exact exposition of the precepts that he taught during a term of sixteen years, ending with his death in 1815. It is the basis of the so-called \"new religion of the Six Nations\" and is preached or recited at all the annual midwinter festivals on the various Iroquois reservations in New York and Ontario that have adherents. These reservations are Onondaga, Tonawanda, Cattaraugus and Allegany in New York and Grand River and Muncytown in Ontario.",
+            "The Gai'wiio' is the record of the teachings of Handsome Lake,the Seneca prophet, and purports to be an exact exposition of the precepts that he taught during a term of sixteen years, ending with his death in 1815. It is the basis of the so-called \"new religion of the Six Nations\" and is preached or recited at all the annual midwinter festivals on the various Iroquois reservations in New York and Ontario that have adherents. These reservations are Onondaga, Tonawanda, Cattaraugus and Allegany in New York and Grand River and Muncytown in Ontario.",
             "There are six authorized \"holders\" of the Gai'wiio' among whom are John Gibson (Ganio'dai'io') and Edward Cornplanter (Soson'dowă). Senecas, and Frank Logan (Adodar'ho), Onondaga. Chief Cornplanter is by far the most conservative though Chief Gibson seems to have the greater store of explanatory matter, often interpolating it during his exposition. Chief Logan is a devout adherent of his religion and watches the waning of his prophet's teachings with grave concern. His grief is like that of Hiawatha (Haiyo''wentha) and inclines him to leave Onondaga for a region where the prophet will not be jeered.",
             "The stated times for the proclaiming of the Gai'wiio' are at the Six Nations' meeting in September and at the midwinter thanksgiving in the moon Nisko wükni, between January 15th and February 15th. At such times the Ongwe''oñweka or \"faithful Indians\" send for an expounder paying his traveling expenses and entertaining him during his stay. Usually reservations exchange preachers, Cornplanter going to Grand River or Onondaga and Chief Gibson to Cattaraugus or Allegany.",
             "The time consumed in reciting the Gai'wiio' is always three days. At noon each day the expositor stops, for the sun is in mid-heaven and ready to descend. All sacred things must be done sēdē'tcia, early in the morning. Before sunrise each morning of the preaching the preacher stands at the fireplace in the long house and sings a song known as the Sun Song. This is an obedience to a command of the prophet who promised that it should insure good weather for the day. \"The wind always dies down when I sing that song,\" affirms Chief Cornplanter.",

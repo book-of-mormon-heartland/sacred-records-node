@@ -4,7 +4,6 @@ const port = 3000;
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import { router } from './routes/rest.js';
 
 
 app.use(express.json());       // to support JSON-encoded bodies
@@ -42,6 +41,13 @@ app.get('/', (req, res) => {
 import { paymentRoutes } from './routes/paymentRoutes.js';
 app.use('/payments', paymentRoutes);
 
+import { bookmarkRoutes } from "./routes/bookmarkRoutes.js";
+app.use("/bookmarks", bookmarkRoutes);
+
+import { bookRoutes } from "./routes/bookRoutes.js";
+app.use("/books", bookRoutes);
+
+import { router } from './routes/rest.js';
 app.use("/rest", router);
 
 //import { theSacredTree } from "./routes/thesacredtree.js";
