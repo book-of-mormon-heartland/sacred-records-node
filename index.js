@@ -38,6 +38,9 @@ app.get('/', (req, res) => {
 });
 
 
+import { authenticationRoutes } from './routes/authenticationRoutes.js';
+app.use('/authentication', authenticationRoutes);
+
 import { paymentRoutes } from './routes/paymentRoutes.js';
 app.use('/payments', paymentRoutes);
 
@@ -47,16 +50,20 @@ app.use("/bookmarks", bookmarkRoutes);
 import { bookRoutes } from "./routes/bookRoutes.js";
 app.use("/books", bookRoutes);
 
+import { chapterRoutes } from "./routes/chapterRoutes.js";
+app.use("/chapters", chapterRoutes);
+
 import { router } from './routes/rest.js';
 app.use("/rest", router);
+
+import { handsomeLake } from "./routes/handsomelake.js";
+app.use("/handsomeLake", handsomeLake);
+
 
 //import { theSacredTree } from "./routes/thesacredtree.js";
 //app.use("/thesacredtree", theSacredTree);
 //import { copper } from "./routes/thecopperrecord.js";
 //app.use("/copper", copper);
-import { handsomeLake } from "./routes/handsomelake.js";
-app.use("/handsomeLake", handsomeLake);
-
 //import { nicodemus } from "./routes/nicodemus.js";
 //app.use("/nicodemus", nicodemus);
 //const nephiteRecord = require("./routes/nephiterecord.js");

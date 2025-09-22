@@ -34,6 +34,7 @@ bookmarkRoutes.post('/createBookmark', async (req, res) => {
 });
 
 bookmarkRoutes.get('/getBookmarks', async (req, res) => {
+  console.log("getBookmarks called")
   //begin security check
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
