@@ -47,6 +47,9 @@ app.use('/payments', paymentRoutes);
 import { bookmarkRoutes } from "./routes/bookmarkRoutes.js";
 app.use("/bookmarks", bookmarkRoutes);
 
+import { subscriptionRoutes } from "./routes/subscriptionRoutes.js";
+app.use("/subscriptions", subscriptionRoutes);
+
 import { bookRoutes } from "./routes/bookRoutes.js";
 app.use("/books", bookRoutes);
 
@@ -59,6 +62,8 @@ app.use("/rest", router);
 import { handsomeLake } from "./routes/handsomelake.js";
 app.use("/handsomeLake", handsomeLake);
 
+import { yahawzhowaa } from "./routes/yahawzhowaaBook6.js";
+app.use("/yahawzhowaa", yahawzhowaa);
 
 //import { theSacredTree } from "./routes/thesacredtree.js";
 //app.use("/thesacredtree", theSacredTree);

@@ -2,7 +2,7 @@ import express from 'express';
 import 'dotenv/config';
 import jwt from 'jsonwebtoken';
 export const bookmarkRoutes = express.Router();
-import { checkToken } from "../security/security.js";
+import { checkToken, checkIfTokenExpiredOrInvalid } from "../security/security.js";
 import { db, getBook, createBookmark, removePreviousBookmark } from "../database/database.js"; // Import the database module
 
 const jwtSecret = process.env.JWT_SECRET;
@@ -15,7 +15,7 @@ bookmarkRoutes.post('/createBookmark', async (req, res) => {
       return res.status(401).send('Unauthorized: No token provided or malformed.');
   }
   const jwtToken = authHeader.split(' ')[1];
-  if (!checkToken(jwtToken)) {
+  if (checkIfTokenExpiredOrInvalid(jwtToken, jwtSecret)) {
       return res.status(401).send('Unauthorized: Token is invalid or expired.');
   }
   // end security check
@@ -41,7 +41,7 @@ bookmarkRoutes.get('/getBookmarks', async (req, res) => {
       return res.status(401).send('Unauthorized: No token provided or malformed.');
   }
   const jwtToken = authHeader.split(' ')[1];
-  if (!checkToken(jwtToken)) {
+  if (checkIfTokenExpiredOrInvalid(jwtToken, jwtSecret)) {
       return res.status(401).send('Unauthorized: Token is invalid or expired.');
   }
   // end security check
@@ -71,7 +71,7 @@ bookmarkRoutes.get('/getBookmark', async (req, res) => {
       return res.status(401).send('Unauthorized: No token provided or malformed.');
   }
   const jwtToken = authHeader.split(' ')[1];
-  if (!checkToken(jwtToken)) {
+  if (checkIfTokenExpiredOrInvalid(jwtToken, jwtSecret)) {
       return res.status(401).send('Unauthorized: Token is invalid or expired.');
   }
   // end security check

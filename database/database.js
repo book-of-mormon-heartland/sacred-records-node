@@ -158,6 +158,24 @@ export const  getUserPurchases = async( userId) => {
   return "";
 }
 
+export const getUserSubscriptions = async (userId) => {
+  const docRef = db.collection('users').doc(userId);
+  try {
+    const docSnap = await docRef.get();
+    if (docSnap.exists) {
+      // The document exists, so get its data
+      const userData = docSnap.data();
+      console.log(userData);
+      return userData.subscriptions;
+    } else {
+      return [];
+    }
+  } catch (error) {
+    console.error("Error getting document:", error);
+    return [];
+  }
+}
+
 export const  addPurchase = async( userId, name, email, bookId, bookTitle, code, paidPrice) => {
   console.log("addPurchase");
   /*
@@ -184,6 +202,7 @@ export const  addPurchase = async( userId, name, email, bookId, bookTitle, code,
     console.error('Error adding purchase:', error);
   }
 }
+
 
 export const  saveLanguageToUserProfile = async( userId, language ) => {
   const docRef = db.collection('users').doc(userId);

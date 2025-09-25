@@ -2,7 +2,7 @@ import express from 'express';
 import 'dotenv/config';
 import jwt from 'jsonwebtoken';
 export const chapterRoutes = express.Router();
-import { checkToken } from "../security/security.js";
+import { checkToken, checkIfTokenExpiredOrInvalid } from "../security/security.js";
 import { db } from "../database/database.js"; // Import the database module
 
 const jwtSecret = process.env.JWT_SECRET;
@@ -14,7 +14,7 @@ chapterRoutes.get('/chapters', (req, res) => {
       return res.status(401).send('Unauthorized: No token provided or malformed.');
   }
   const jwtToken = authHeader.split(' ')[1];
-  if (!checkToken(jwtToken)) {
+  if (checkIfTokenExpiredOrInvalid(jwtToken, jwtSecret)) {
       return res.status(401).send('Unauthorized: Token is invalid or expired.');
   }
   // end security check
@@ -49,7 +49,7 @@ chapterRoutes.get('/chapterContentText', (req, res) => {
       return res.status(401).send('Unauthorized: No token provided or malformed.');
   }
   const jwtToken = authHeader.split(' ')[1];
-  if (!checkToken(jwtToken)) {
+  if (checkIfTokenExpiredOrInvalid(jwtToken, jwtSecret)) {
       return res.status(401).send('Unauthorized: Token is invalid or expired.');
   }
   // end security check

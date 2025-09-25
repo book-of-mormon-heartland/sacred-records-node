@@ -2,7 +2,7 @@ import express from 'express';
 import 'dotenv/config';
 import jwt from 'jsonwebtoken';
 export const bookRoutes = express.Router();
-import { checkToken } from "../security/security.js";
+import { checkToken, checkIfTokenExpiredOrInvalid } from "../security/security.js";
 import { db, getBook, createBookmark, removePreviousBookmark } from "../database/database.js"; // Import the database module
 
 const jwtSecret = process.env.JWT_SECRET;
@@ -15,7 +15,7 @@ bookRoutes.get('/bookshelf', (req, res) => {
       return res.status(401).send('Unauthorized: No token provided or malformed.');
   }
   const jwtToken = authHeader.split(' ')[1];
-  if (!checkToken(jwtToken)) {
+  if (checkIfTokenExpiredOrInvalid(jwtToken, jwtSecret)) {
       return res.status(401).send('Unauthorized: Token is invalid or expired.');
   }
   // end security check
@@ -80,7 +80,7 @@ bookRoutes.get('/books', (req, res) => {
       return res.status(401).send('Unauthorized: No token provided or malformed.');
   }
   const jwtToken = authHeader.split(' ')[1];
-  if (!checkToken(jwtToken)) {
+  if (checkIfTokenExpiredOrInvalid(jwtToken, jwtSecret)) {
       return res.status(401).send('Unauthorized: Token is invalid or expired.');
   }
   // end security check
@@ -112,7 +112,7 @@ bookRoutes.get('/getBooksByCategory', async (req, res) => {
       return res.status(401).send('Unauthorized: No token provided or malformed.');
   }
   const jwtToken = authHeader.split(' ')[1];
-  if (!checkToken(jwtToken)) {
+  if (checkIfTokenExpiredOrInvalid(jwtToken, jwtSecret)) {
       return res.status(401).send('Unauthorized: Token is invalid or expired.');
   }
   // end security check
@@ -143,7 +143,7 @@ bookRoutes.get('/book', (req, res) => {
       return res.status(401).send('Unauthorized: No token provided or malformed.');
   }
   const jwtToken = authHeader.split(' ')[1];
-  if (!checkToken(jwtToken)) {
+  if (checkIfTokenExpiredOrInvalid(jwtToken, jwtSecret)) {
       return res.status(401).send('Unauthorized: Token is invalid or expired.');
   }
   // end security check
@@ -178,7 +178,7 @@ bookRoutes.get('/bookForReview', (req, res) => {
       return res.status(401).send('Unauthorized: No token provided or malformed.');
   }
   const jwtToken = authHeader.split(' ')[1];
-  if (!checkToken(jwtToken)) {
+  if (checkIfTokenExpiredOrInvalid(jwtToken, jwtSecret)) {
       return res.status(401).send('Unauthorized: Token is invalid or expired.');
   }
   // end security check
@@ -215,7 +215,7 @@ bookRoutes.get('/populateStore', (req, res) => {
       return res.status(401).send('Unauthorized: No token provided or malformed.');
   }
   const jwtToken = authHeader.split(' ')[1];
-  if (!checkToken(jwtToken)) {
+  if (checkIfTokenExpiredOrInvalid(jwtToken, jwtSecret)) {
       return res.status(401).send('Unauthorized: Token is invalid or expired.');
   }
   // end security check

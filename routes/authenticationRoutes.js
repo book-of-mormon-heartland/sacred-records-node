@@ -4,8 +4,8 @@ import jwt from 'jsonwebtoken';
 export const authenticationRoutes = express.Router();
 import { OAuth2Client } from 'google-auth-library';
 
-import { checkToken, checkIfTokenExpired, checkTokenUserMatch } from "../security/security.js";
-import { addOrUpdateUser, getUserLanguage, getUserPurchases } from "../database/database.js"; // Import the database module
+import { checkTokenUserMatch, checkIfTokenExpiredOrInvalid } from "../security/security.js";
+import { addOrUpdateUser, getUserLanguage, getUserPurchases, getUserSubscriptions } from "../database/database.js"; // Import the database module
 
 const GOOGLE_WEB_CLIENT_ID  = process.env.GOOGLE_WEB_CLIENT_ID;
 const GOOGLE_ANDROID_CLIENT_ID = process.env.GOOGLE_ANDROID_CLIENT_ID;
@@ -43,11 +43,19 @@ authenticationRoutes.post('/googlelogin', (req, res) => {
     let language = await getUserLanguage(user.id);
     let purchases = await getUserPurchases(user.id);
     if(!purchases) {
-      //console.log("log: no purchases array found, setting to empty array");
+      // we are giving them a book for free.
       purchases = ["the-sacred-tree-en"];
       user.purchases = purchases;
       await addOrUpdateUser(user);
     }
+    let subscriptions = await getUserSubscriptions(user.id);
+    if(!subscriptions) {
+      // should be no subscriptions by default.
+      subscriptions = [];
+      user.subscriptions = subscriptions;
+      await addOrUpdateUser(user);
+    }
+
     //console.log(purchases);
     // generate the jwt token.
     let jwtToken = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: '1h' });
@@ -87,15 +95,15 @@ authenticationRoutes.post('/refreshJwtToken', (req, res) => {
   const jwtToken = authHeader.split(' ')[1];
   console.log("This is the jwtToken");
   console.log(jwtToken);
-  console.log(checkIfTokenExpired(jwtToken));
-  if (checkIfTokenExpired(jwtToken)) {
+  console.log(checkIfTokenExpiredOrInvalid(jwtToken, jwtSecret));
+  if (checkIfTokenExpiredOrInvalid(jwtToken, jwtSecret)) {
     console.log("Token Expired");
     // The token is expired.  Lets check if the authToken is expired.
     let refreshToken = req.body.refreshToken;
     let userId = req.body.userId;
     console.log("This is the refreshToken");
     console.log(refreshToken);
-    if(checkIfTokenExpired(refreshToken)) {
+    if(checkIfTokenExpiredOrInvalid(refreshToken, jwtSecret)) {
       // if expired return an error message.
       console.log("expired");
       return res.status(401).send('Unauthorized: RefreshToken is expired.');

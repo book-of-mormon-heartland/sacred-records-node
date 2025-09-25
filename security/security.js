@@ -19,7 +19,7 @@ export const checkToken = (jwtTokenValue) => {
     return !isExpired;
 }
 
-
+/*
 export const checkIfTokenExpired = (jwtTokenValue) => {
     
     try {
@@ -33,6 +33,27 @@ export const checkIfTokenExpired = (jwtTokenValue) => {
        return true;
     }
 }
+*/
+
+export const checkIfTokenExpiredOrInvalid = (jwtTokenValue, jwtSecret) => {
+    try {
+        // jwt.verify automatically throws an error if the token is expired,
+        // has an invalid signature, or is otherwise malformed.
+        jwt.verify(jwtTokenValue, jwtSecret);
+        
+        // If execution reaches here, the token is valid and NOT expired.
+        return false;
+        
+    } catch (err) {
+        // Log the error for debugging purposes (optional)
+        // console.error("JWT verification failed:", err.message);
+
+        // A TokenExpiredError, JsonWebTokenError (for invalid signature), 
+        // or other error means the token is no longer usable.
+        // We can simply return true in all these cases.
+        return true; 
+    }
+};
 
 
 export const checkTokenUserMatch = (refreshToken, userId) => {
